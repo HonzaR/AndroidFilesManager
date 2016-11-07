@@ -2,6 +2,7 @@ package com.honzar.androidfilesmanager.library;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
@@ -626,7 +627,7 @@ public class FilesManager {
             return;
         }
         MoveStorageTask task = new MoveStorageTask(mContext, FilesManagerPreferences.EXTERNAL_STORAGE, callbacks);
-        task.parallelExecute();
+        task.execute();
     }
 
     /**
@@ -642,7 +643,7 @@ public class FilesManager {
             return;
         }
         MoveStorageTask task = new MoveStorageTask(mContext, FilesManagerPreferences.INTERNAL_STORAGE, callbacks);
-        task.parallelExecute();
+        task.execute();
     }
 
     /**
@@ -658,7 +659,7 @@ public class FilesManager {
             return;
         }
         MoveStorageTask task = new MoveStorageTask(mContext, resolveOptimalStorage(), callbacks);
-        task.parallelExecute();
+        task.execute();
     }
 
     /**
@@ -790,7 +791,7 @@ public class FilesManager {
     /**
      * Asynchronous task to move all storage files to selected storage.
      */
-    public class MoveStorageTask extends ParallelAsyncTask<Void, Void, Boolean> {
+    public class MoveStorageTask extends AsyncTask<Void, Void, Boolean> {
 
         Context context;
         Activity activity;
