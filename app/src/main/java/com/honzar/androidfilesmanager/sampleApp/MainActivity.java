@@ -1,4 +1,4 @@
-package com.honzar.androidfilesmanager.testApp;
+package com.honzar.androidfilesmanager.sampleApp;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.honzar.androidfilesmanager.library.FilesManager;
-import com.honzar.androidfilesmanager.library.FilesManagerPreferences;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements AskForStorageChangeDialog.IOnAskStorageMoveDialogListener {
 
@@ -35,17 +38,17 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
             @Override
             public void onClick(View view) {
 
-                manager.moveStorageToExternal(new FilesManager.OptimalStorageMoveInterface() {
+                manager.moveStorageToInternal(new FilesManager.OptimalStorageMoveInterface() {
                     @Override
-                    public void moveStorageStarts() {
+                    public void moveStorageStarts(FilesManager.MoveStorageTask task) {
                         Toast.makeText(mContext, getString(R.string.task_move_storage_start), Toast.LENGTH_LONG).show();
                     }
                     @Override
-                    public void moveStorageEndsSuccess() {
+                    public void moveStorageEndsSuccess(FilesManager.MoveStorageTask task) {
                         Toast.makeText(mContext, getString(R.string.task_move_storage_end_success), Toast.LENGTH_LONG).show();
                     }
                     @Override
-                    public void moveStorageEndsError() {
+                    public void moveStorageEndsError(FilesManager.MoveStorageTask task, Exception e) {
                         Toast.makeText(mContext, getString(R.string.task_move_storage_end_error), Toast.LENGTH_LONG).show();
                     }
                     @Override
@@ -54,13 +57,11 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
                     }
                 });
 
-//                manager.writeObjectToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
-//                manager.writeObjectToFile(manager.getFile("test2.txt"), "test");
-//                try {
-//                    manager.writeObjectToFile(manager.getFile("test3"), new JSONObject().put("juju", 2));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                Log.d("read", "string: " + manager.readStringFromFile(manager.getFile("test2.txt")));
+                Log.d("read", "json: " + manager.readJSONObjectFromFile(manager.getFile("test3")));
+                Log.d("read", "byte[]: " + manager.readByteArrayFromFile(manager.getFile("test1")));
+
+
             }
         });
 
@@ -72,16 +73,24 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
             ft.commitAllowingStateLoss();
         }
 
-        manager.createEmptyDir("slozka", "slozenka");
-        manager.createEmptyFile("slozka/slozenka", "file4");
-
         Button btnTest1 = (Button) findViewById(R.id.btn_test_1);
         btnTest1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                manager.deleteStorage(FilesManagerPreferences.DEFAULT);
+                manager.createEmptyDir("slozka", "sloziii");
+                manager.createEmptyFile("slozka/slozenka", "file44");
             }
         });
+
+        manager.writeObjectToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
+        manager.writeObjectToFile(manager.getFile("test2.txt"), "test");
+        try {
+            manager.writeObjectToFile(manager.getFile("test3"), new JSONObject().put("juju", 2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 
@@ -90,15 +99,15 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
     {
         manager.moveStorageToOptimal(new FilesManager.OptimalStorageMoveInterface() {
             @Override
-            public void moveStorageStarts() {
+            public void moveStorageStarts(FilesManager.MoveStorageTask task) {
                 Toast.makeText(mContext, getString(R.string.task_move_storage_start), Toast.LENGTH_LONG).show();
             }
             @Override
-            public void moveStorageEndsSuccess() {
+            public void moveStorageEndsSuccess(FilesManager.MoveStorageTask task) {
                 Toast.makeText(mContext, getString(R.string.task_move_storage_end_success), Toast.LENGTH_LONG).show();
             }
             @Override
-            public void moveStorageEndsError() {
+            public void moveStorageEndsError(FilesManager.MoveStorageTask task, Exception e) {
                 Toast.makeText(mContext, getString(R.string.task_move_storage_end_error), Toast.LENGTH_LONG).show();
             }
             @Override

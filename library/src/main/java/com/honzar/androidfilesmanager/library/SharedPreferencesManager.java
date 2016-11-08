@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 public class SharedPreferencesManager {
 
     public static final String PREFS_NONE = "none";
+    public static final int PREFS_NONE_NUM = -1;
     public static final String PREFS_SELECTED_STORAGE = "selected_storage";
     public static final String PREFS_LAST_STORAGES_CONFIGURATION = "last_storages_configuration";
     private static final String PREFS_LAST_USER_ASKED_FOR_CHANGE_STORAGE = "last_user_asked_for_change_storage";
@@ -74,7 +75,7 @@ public class SharedPreferencesManager {
 
     public int getSelectedStorage()
     {
-        return getPreferences().getInt(PREFS_SELECTED_STORAGE, -1);
+        return getPreferences().getInt(PREFS_SELECTED_STORAGE, PREFS_NONE_NUM);
     }
 
     // LAST GO TO BACKGROUND TIME
@@ -88,7 +89,7 @@ public class SharedPreferencesManager {
 
     public long getLastUserAskedForChangeStorage()
     {
-        return getPreferences().getLong(PREFS_LAST_USER_ASKED_FOR_CHANGE_STORAGE, -1);
+        return getPreferences().getLong(PREFS_LAST_USER_ASKED_FOR_CHANGE_STORAGE, PREFS_NONE_NUM);
     }
 
 }

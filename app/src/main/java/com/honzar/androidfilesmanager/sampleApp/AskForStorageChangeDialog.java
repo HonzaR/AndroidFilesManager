@@ -1,11 +1,11 @@
-package com.honzar.androidfilesmanager.testApp;
+package com.honzar.androidfilesmanager.sampleApp;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.honzar.androidfilesmanager.library.FilesManagerPreferences;
+import com.honzar.androidfilesmanager.library.FilesManager;
 
 import eu.inmite.android.lib.dialogs.BaseDialogFragment;
 
@@ -34,7 +34,7 @@ public class AskForStorageChangeDialog extends BaseDialogFragment {
         this.storageId = bundle.getInt(BUNDLE_STORAGE);
 
         b.setTitle(getString(R.string.dialog_ask_storage_change_title));
-        ((TextView) root.findViewById(R.id.tv_msg)).setText(getString(R.string.dialog_ask_storage_change_msg).replace("ˆsˆ", FilesManagerPreferences.resolveStorageName(getContext(), storageId)));
+        ((TextView) root.findViewById(R.id.tv_msg)).setText(getString(R.string.dialog_ask_storage_change_msg).replace("ˆsˆ", storageId == FilesManager.EXTERNAL_STORAGE ? "external" : "internal"));
 
         b.setView(root);
 
