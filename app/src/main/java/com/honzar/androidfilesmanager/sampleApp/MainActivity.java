@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
                 });
 
                 Log.d("read", "string: " + manager.readStringFromFile(manager.getFile("test2.txt")));
-                Log.d("read", "json: " + manager.readJSONObjectFromFile(manager.getFile("test3")));
+                Log.d("read", "json: " + manager.readJsonFromFile(manager.getFile("test3")));
                 Log.d("read", "byte[]: " + manager.readByteArrayFromFile(manager.getFile("test1")));
 
 
@@ -97,10 +97,10 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
             }
         });
 
-        manager.writeObjectToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
-        manager.writeObjectToFile(manager.getFile("test2.txt"), "test");
+        manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
+        manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {
-            manager.writeObjectToFile(manager.getFile("test3"), new JSONObject().put("juju", 2));
+            manager.writeJsonToFile(manager.getFile("test3"), new JSONObject().put("juju", 2));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
         {
             builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlString)));
-            manager.writeObjectToFile(manager.getFile("test5.xml"), document);
+            manager.writeXmlToFile(manager.getFile("test5.xml"), document);
         } catch (Exception e) {
             e.printStackTrace();
         }
