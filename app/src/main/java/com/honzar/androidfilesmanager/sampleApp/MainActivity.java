@@ -17,6 +17,13 @@ import com.honzar.androidfilesmanager.library.FilesManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import java.io.StringReader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class MainActivity extends AppCompatActivity implements AskForStorageChangeDialog.IOnAskStorageMoveDialogListener {
 
@@ -82,6 +89,14 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
             }
         });
 
+        Button btnTest2 = (Button) findViewById(R.id.btn_test_2);
+        btnTest2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager.readXmlFromFile(manager.getFile("test5.xml"));
+            }
+        });
+
         manager.writeObjectToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeObjectToFile(manager.getFile("test2.txt"), "test");
         try {
@@ -91,13 +106,30 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
         }
 
 
+        String xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+               "<note>\n" +
+                "<to>Tove</to>\n" +
+                "<from>Jani</from>\n" +
+                "<heading>Reminder</heading>\n" +
+                "<body>Don't forget me this weekend!</body>\n" +
+                "</note>";
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try
+        {
+            builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
+            manager.writeObjectToFile(manager.getFile("test5.xml"), document);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void onAskStorageMove(int storageId)
     {
-        manager.moveStorageToOptimal(new FilesManager.OptimalStorageMoveInterface() {
+        manager.moveStorageToExternal(new FilesManager.OptimalStorageMoveInterface() {
             @Override
             public void moveStorageStarts(FilesManager.MoveStorageTask task) {
                 Toast.makeText(mContext, getString(R.string.task_move_storage_start), Toast.LENGTH_LONG).show();

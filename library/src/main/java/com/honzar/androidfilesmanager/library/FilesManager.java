@@ -11,15 +11,27 @@ import android.util.Xml;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlSerializer;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Created by Honza Rychnovský on 3.11.2016.
@@ -74,7 +86,7 @@ public class FilesManager {
 
         // set up current configuration
         this.storagesConfiguration = prefsManager.getPrefsLastStoragesConfiguration();
-        if (storagesConfiguration.equals(SharedPreferencesManager.PREFS_NONE)) {
+        if (storagesConfiguration == null) {
             storagesConfiguration = getCurrentStoragesConfiguration();
         }
 
@@ -740,16 +752,34 @@ public class FilesManager {
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeObjectToFile(File file, Xml data)
+    public boolean writeObjectToFile(File file, Document data)
     {
         try {
             FileOutputStream out = new FileOutputStream(file);
-            out.write((data.toString()).getBytes());
+            StringWriter writer = new StringWriter();
+            XmlSerializer xmlSerializer = Xml.newSerializer();
+            TransformerFactory tf = TransformerFactory.newInstance();
+
+            Transformer t = tf.newTransformer();
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.transform(new DOMSource(data), new StreamResult(writer));
+
+            xmlSerializer.setOutput(writer);
+            xmlSerializer.flush();
+
+            out.write(writer.toString().getBytes());
             out.close();
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (TransformerConfigurationException tce) {
+            tce.printStackTrace();
+        } catch (TransformerException tce) {
+            tce.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
+
+
         return false;
     }
 
@@ -818,20 +848,27 @@ public class FilesManager {
      * @param file
      * @return Xml if succeed, null otherwise.
      */
-    public Xml readXmlFromFile(File file)
+    public Document readXmlFromFile(File file)
     {
         String res = readStringFromFile(file);
 
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = factory.newPullParser();
-            if (res != null) {
-                parser.setInput(new StringReader(res));
-                factory.
-            }
+        if (res != null) {
 
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+                factory.setNamespaceAware(true);
+                DocumentBuilder builder = factory.newDocumentBuilder();
+
+                return builder.parse(new ByteArrayInputStream(res.getBytes()));
+
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            } catch (ParserConfigurationException pce) {
+                pce.printStackTrace();
+            } catch (SAXException se) {
+                se.printStackTrace();
+            }
         }
         return null;
     }
