@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="dialog_ask_storage_change_title">Files Storage Change</string>
-    <string name="dialog_ask_storage_change_msg">It seems, that You have more free space in ˆsˆ storage of Your device. Do you want to move application files there?</string>
+    <string name="dialog_ask_storage_change_msg">It seems, that you can move your files to another storage. Do you want to move application files there?</string>
     <string name="dialog_ask_storage_change_move">Move</string>
     <string name="dialog_ask_storage_change_cancel">Cancel</string>
     <string name="task_move_storage_start">Start moving files…</string>

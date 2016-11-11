@@ -50,8 +50,8 @@ public class FilesManager {
     private static FilesManager instance;
     private static Context mContext;
     private SharedPreferencesManager prefsManager;
-    private String externalStorage;
-    private String internalStorage;
+    private String externalStoragePath;
+    private String internalStoragePath;
     private int currentStorageID;
     private String storagesConfiguration;
 
@@ -78,16 +78,13 @@ public class FilesManager {
         this.mContext = c;
         this.prefsManager = SharedPreferencesManager.getInstance(mContext);
 
-        this.internalStorage = mContext.getFilesDir().getAbsoluteFile() + "/";
-        File[] extStorages = ContextCompat.getExternalFilesDirs(mContext, null);
-        if (extStorages != null && extStorages.length > 0) {
-            this.externalStorage = extStorages[0].getAbsoluteFile() + "/";
-        }
+        this.internalStoragePath = resolveInternalStorageString();
+        this.externalStoragePath = resolveExternalStorageString();
 
         // set up current configuration
         this.storagesConfiguration = prefsManager.getPrefsLastStoragesConfiguration();
         if (storagesConfiguration == null) {
-            storagesConfiguration = getCurrentStoragesConfiguration();
+            storagesConfiguration = getStoragesConfiguration();
         }
 
         // get optimal storage
@@ -103,6 +100,29 @@ public class FilesManager {
     //
 
     /**
+     * Resolves current internal storage string.
+     * @return storage string
+     */
+    private String resolveInternalStorageString()
+    {
+        return mContext.getFilesDir().getAbsoluteFile() + "/";
+    }
+
+    /**
+     * Resolves current external storage string.
+     * @return storage string
+     */
+    private String resolveExternalStorageString()
+    {
+        String storage = null;
+        File[] extStorages = ContextCompat.getExternalFilesDirs(mContext, null);
+        if (extStorages != null && extStorages.length > 0) {
+            storage = extStorages[0].getAbsoluteFile() + "/";
+        }
+        return storage;
+    }
+
+    /**
      * Resolves storage path from storage ID.
      * @param storageId storage ID
      * @return storage string object
@@ -111,11 +131,9 @@ public class FilesManager {
     {
         switch (storageId) {
             case INTERNAL_STORAGE:
-                return internalStorage;
+                return internalStoragePath;
             case EXTERNAL_STORAGE:
-                return externalStorage;
-            case DEFAULT_STORAGE:
-                return getStoragePath(currentStorageID);
+                return externalStoragePath;
             default:
                 return getStoragePath(currentStorageID);
         }
@@ -125,9 +143,20 @@ public class FilesManager {
      * Returns current storages configuration string.
      * @return current storages configuration string
      */
-    private String getCurrentStoragesConfiguration()
+    private String getStoragesConfiguration()
     {
-        return internalStorage + externalStorage;
+        return internalStoragePath + externalStoragePath;
+    }
+
+    /**
+     * Resolves and returns most current storages configuration.
+     * @return storages string
+     */
+    private String getMostCurrentStoragesConfigurations()
+    {
+        String internal = resolveInternalStorageString();
+        String external = resolveExternalStorageString();
+        return internal + external;
     }
 
     /**
@@ -135,11 +164,11 @@ public class FilesManager {
      * @param path to be tested.
      * @return path string ending with "/" character
      */
-    private String addSlasheToPathIfNeeded(String path)
+    private String addSlashToPathIfNeeded(String path)
     {
         if (path != null) {
 
-            if(!path.endsWith("/"))
+            if (!path.endsWith("/"))
                 path += "/";
 
             return path;
@@ -153,9 +182,9 @@ public class FilesManager {
      * @param dir
      * @return path string starting with storage path
      */
-    private String addStorageDirectoryToPath(String storagePath, String dir)
+    private String addDirectoryToStoragePath(String storagePath, String dir)
     {
-        return (dir == null ? storagePath : storagePath + dir);
+        return (dir == null) ? storagePath : storagePath + dir;
     }
 
     /**
@@ -230,11 +259,11 @@ public class FilesManager {
      */
     public File getFile(String filePath, String fileName, int storageId)
     {
-        filePath = addSlasheToPathIfNeeded(filePath);
+        filePath = addSlashToPathIfNeeded(filePath);
 
         String storageToBeUsed = getStoragePath(storageId);
 
-        filePath = addStorageDirectoryToPath(storageToBeUsed, filePath);
+        filePath = addDirectoryToStoragePath(storageToBeUsed, filePath);
 
         if (fileName != null) {
             return new File(filePath, fileName);
@@ -270,8 +299,8 @@ public class FilesManager {
 
         String storageToBeUsed = getStoragePath(storageId);
 
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
-        path = addStorageDirectoryToPath(storageToBeUsed, path);
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(storageToBeUsed, path);
 
         inFiles = (ArrayList<File>) FileUtils.listFiles(new File(path), null, true);
 
@@ -332,13 +361,13 @@ public class FilesManager {
      */
     public boolean copyFile(String fileName, String srcDir, String destDir, int storageId)
     {
-        srcDir = (srcDir != null ? addSlasheToPathIfNeeded(srcDir) : "");
-        destDir = (destDir != null ? addSlasheToPathIfNeeded(destDir) : "");
+        srcDir = (srcDir != null) ? addSlashToPathIfNeeded(srcDir) : "";
+        destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
 
-        srcDir = addStorageDirectoryToPath(storageToBeUsed, srcDir);
-        destDir = addStorageDirectoryToPath(storageToBeUsed, destDir);
+        srcDir = addDirectoryToStoragePath(storageToBeUsed, srcDir);
+        destDir = addDirectoryToStoragePath(storageToBeUsed, destDir);
 
         try {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destDir, fileName), true);
@@ -363,8 +392,8 @@ public class FilesManager {
      */
     public boolean checkFileExists(String fileName, String path)
     {
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
-        path = addStorageDirectoryToPath(getStoragePath(currentStorageID), path);
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
         try {
             File file = new File(path, fileName);
@@ -398,11 +427,11 @@ public class FilesManager {
      */
     public File createEmptyFile(String filePath, String fileName, int storageId)
     {
-        filePath = (filePath != null ? addSlasheToPathIfNeeded(filePath) : "");
+        filePath = (filePath != null) ? addSlashToPathIfNeeded(filePath) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
 
-        filePath = addStorageDirectoryToPath(storageToBeUsed, filePath);
+        filePath = addDirectoryToStoragePath(storageToBeUsed, filePath);
 
         try {
 
@@ -426,8 +455,8 @@ public class FilesManager {
      */
     public boolean deleteFile(String path, String fileName)
     {
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
-        path = addStorageDirectoryToPath(getStoragePath(currentStorageID), path);
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
         return (new File(path, fileName)).delete();
     }
@@ -466,11 +495,11 @@ public class FilesManager {
      */
     public File createEmptyDir(String path, String dirName, int storageId)
     {
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
 
-        path = addStorageDirectoryToPath(storageToBeUsed, path);
+        path = addDirectoryToStoragePath(storageToBeUsed, path);
 
         File folder = new File(path, dirName);
 
@@ -493,8 +522,8 @@ public class FilesManager {
      */
     public boolean deleteDir(String path)
     {
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
-        path = addStorageDirectoryToPath(getStoragePath(currentStorageID), path);
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
         try {
             FileUtils.deleteDirectory(new File(path));
@@ -515,8 +544,8 @@ public class FilesManager {
      */
     public File renameDirectory(String path, String oldName, String newName)
     {
-        path = (path != null ? addSlasheToPathIfNeeded(path) : "");
-        path = addStorageDirectoryToPath(getStoragePath(currentStorageID), path);
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
         if (new File(path, oldName).renameTo(new File(path, newName))) {
             return new File(path, newName);
@@ -627,21 +656,28 @@ public class FilesManager {
     }
 
     /**
-     * Checks if optimal storage is used.
+     * Check if there is some changes in storages configuration
      * @return true/false
      */
-    public boolean checkOptimalStorageIsUsed()
+    public boolean checkIfStoragesChanged()
     {
-        if (prefsManager.getPrefsLastStoragesConfiguration() == null) {     // first launch
+        if (prefsManager.getPrefsLastStoragesConfiguration() == null) { // first launch
             currentStorageID = getOptimalStorage();
             prefsManager.saveSelectedStorage(currentStorageID);
             prefsManager.saveLastUserAskedForChangeStorage(System.currentTimeMillis());
-            prefsManager.saveStoragesConfiguration(storagesConfiguration);
+            prefsManager.saveStoragesConfiguration(getStoragesConfiguration());
             return true;
-
-        } else {                                                            // check last configuration
-            return !(!storagesConfiguration.equals(prefsManager.getPrefsLastStoragesConfiguration()) || getOptimalStorage() != prefsManager.getSelectedStorage());
         }
+        return !getMostCurrentStoragesConfigurations().equals(prefsManager.getPrefsLastStoragesConfiguration());
+    }
+
+    /**
+     * Checks if optimal storage is used.
+     * @return true/false
+     */
+    public boolean isOptimalStorageUsed()
+    {
+        return (getOptimalStorage() == prefsManager.getSelectedStorage());
     }
 
     //
@@ -654,7 +690,7 @@ public class FilesManager {
      */
     public boolean isExternalStorageWritable()
     {
-        if (externalStorage != null) {
+        if (externalStoragePath != null) {
             String state = Environment.getExternalStorageState();
             if (Environment.MEDIA_MOUNTED.equals(state)) {
                 return true;
@@ -692,7 +728,7 @@ public class FilesManager {
      */
     public long getExternalStorageFreeSpace()
     {
-        return getStorageFreeSpace(externalStorage);
+        return getStorageFreeSpace(externalStoragePath);
     }
 
     /**
@@ -701,7 +737,7 @@ public class FilesManager {
      */
     public long getInternalStorageFreeSpace()
     {
-        return getStorageFreeSpace(internalStorage);
+        return getStorageFreeSpace(internalStoragePath);
     }
 
 
@@ -836,7 +872,7 @@ public class FilesManager {
         String res = readStringFromFile(file);
 
         try {
-            return (res != null ? new JSONObject(res) : null);
+            return (res != null) ? new JSONObject(res) : null;
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -920,11 +956,11 @@ public class FilesManager {
             this.storageID = storageID;
 
             if (storageID == INTERNAL_STORAGE) {
-                this.from = externalStorage;
-                this.to = internalStorage;
+                this.from = externalStoragePath;
+                this.to = internalStoragePath;
             } else {
-                this.from = internalStorage;
-                this.to = externalStorage;
+                this.from = internalStoragePath;
+                this.to = externalStoragePath;
             }
         }
 
@@ -957,10 +993,12 @@ public class FilesManager {
                     callbacks.moveStorageEndsSuccess(this);
 
                     currentStorageID = storageID;
-                    storagesConfiguration = getCurrentStoragesConfiguration();
+
+                    internalStoragePath = resolveInternalStorageString();
+                    externalStoragePath = resolveExternalStorageString();
 
                     prefsManager.saveSelectedStorage(storageID);
-                    prefsManager.saveStoragesConfiguration(storagesConfiguration);
+                    prefsManager.saveStoragesConfiguration(getStoragesConfiguration());
                     prefsManager.saveLastUserAskedForChangeStorage(System.currentTimeMillis());
                 }
             } else {

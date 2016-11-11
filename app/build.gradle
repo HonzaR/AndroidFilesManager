@@ -28,5 +28,4 @@ dependencies {
     compile 'com.android.support:design:25.0.0'
     testCompile 'junit:junit:4.12'
     compile project(path: ':library')
-    compile project(path: ':android-styled-dialog')
 }

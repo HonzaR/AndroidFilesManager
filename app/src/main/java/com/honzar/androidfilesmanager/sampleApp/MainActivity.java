@@ -1,9 +1,10 @@
 package com.honzar.androidfilesmanager.sampleApp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,7 +26,7 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-public class MainActivity extends AppCompatActivity implements AskForStorageChangeDialog.IOnAskStorageMoveDialogListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private Context mContext;
@@ -73,11 +74,22 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
         });
 
         manager = FilesManager.getInstance(mContext);
-        if (!manager.checkOptimalStorageIsUsed()) {
-            AskForStorageChangeDialog dialog = AskForStorageChangeDialog.newInstance(manager.getOptimalStorage());
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(dialog, AskForStorageChangeDialog.FRAGMENT_TAG);
-            ft.commitAllowingStateLoss();
+        if (manager.checkIfStoragesChanged() || !manager.isOptimalStorageUsed()) {
+
+            new AlertDialog.Builder(mContext)
+                    .setTitle(getString(R.string.dialog_ask_storage_change_title))
+                    .setMessage(getString(R.string.dialog_ask_storage_change_msg))
+                    .setPositiveButton(R.string.dialog_ask_storage_change_move, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            onAskStorageMove(manager.getOptimalStorage());
+                        }
+                    })
+                    .setNegativeButton(R.string.dialog_ask_storage_change_cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            onAskStorageCancel(manager.getOptimalStorage());
+                        }
+                    })
+                    .show();
         }
 
         Button btnTest1 = (Button) findViewById(R.id.btn_test_1);
@@ -126,10 +138,9 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
 
     }
 
-    @Override
     public void onAskStorageMove(int storageId)
     {
-        manager.moveStorageToExternal(new FilesManager.OptimalStorageMoveInterface() {
+        manager.moveStorageToOptimal(new FilesManager.OptimalStorageMoveInterface() {
             @Override
             public void moveStorageStarts(FilesManager.MoveStorageTask task) {
                 Toast.makeText(mContext, getString(R.string.task_move_storage_start), Toast.LENGTH_LONG).show();
@@ -149,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements AskForStorageChan
         });
     }
 
-    @Override
     public void onAskStorageCancel(int storageId)
     {
         // nothing to do
