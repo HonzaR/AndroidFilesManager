@@ -471,6 +471,25 @@ public class FilesManager {
         return file.delete();
     }
 
+    /**
+     * Renames file on selected path with old name to new name.
+     * @param path
+     * @param oldName
+     * @param newName
+     * @return renamed File object if succeed, null otherwise.
+     */
+    public File renameFile(String path, String oldName, String newName)
+    {
+        path = (path != null) ? addSlashToPathIfNeeded(path) : "";
+        path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
+
+        if (new File(path, oldName).renameTo(new File(path, newName))) {
+            return new File(path, newName);
+        }
+
+        return null;
+    }
+
     //
     //  DIRECTORY METHODS
     //

@@ -41,3 +41,4 @@ build/intermediates/model_data.bin
 .idea/runConfigurations.xml
 build/intermediates/dex-cache/cache.xml
 *.apk
+build/generated/mockable-android-25.jar

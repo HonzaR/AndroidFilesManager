@@ -136,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        manager.createEmptyDir(null, "renameDir");
+        manager.createEmptyFile("renameDir", "a.txt");
+        manager.renameFile("renameDir", "a.txt", "b.txt");
+
     }
 
     public void onAskStorageMove(int storageId)
