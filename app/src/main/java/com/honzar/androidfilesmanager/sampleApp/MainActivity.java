@@ -2,6 +2,7 @@ package com.honzar.androidfilesmanager.sampleApp;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -139,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
         manager.createEmptyDir(null, "renameDir");
         manager.createEmptyFile("renameDir", "a.txt");
         manager.renameFile("renameDir", "a.txt", "b.txt");
+
+        manager.copyFile(Uri.fromFile(manager.getFile("renameDir", "b.txt")), "b.txt", null);
 
     }
 
