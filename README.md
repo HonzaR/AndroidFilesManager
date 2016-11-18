@@ -17,6 +17,7 @@ Library also contains bunch of public methods for work with files on storages:
     getAllFileFromCurrentStorage
     copyFile
     copyFile
+    copyFile
     checkFileExists
     createEmptyFile
     createEmptyFile
