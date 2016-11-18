@@ -94,6 +94,9 @@ public class FilesManager {
         currentStorageID = prefsManager.getSelectedStorage();
         if (currentStorageID == SharedPreferencesManager.PREFS_NONE_NUM) {
             currentStorageID = getOptimalStorage();
+            prefsManager.saveSelectedStorage(currentStorageID);
+            prefsManager.saveLastUserAskedForChangeStorage(System.currentTimeMillis());
+            prefsManager.saveStoragesConfiguration(getStoragesConfiguration());
         }
     }
 
@@ -119,7 +122,7 @@ public class FilesManager {
     {
         String storage = null;
         File[] extStorages = ContextCompat.getExternalFilesDirs(mContext, null);
-        if (extStorages != null && extStorages.length > 0) {
+        if (extStorages != null && extStorages.length > 0 && extStorages[0] != null) {
             storage = extStorages[0].getAbsoluteFile() + "/";
         }
         return storage;
@@ -715,7 +718,7 @@ public class FilesManager {
             prefsManager.saveSelectedStorage(currentStorageID);
             prefsManager.saveLastUserAskedForChangeStorage(System.currentTimeMillis());
             prefsManager.saveStoragesConfiguration(getStoragesConfiguration());
-            return true;
+            return false;
         }
         return !getMostCurrentStoragesConfigurations().equals(prefsManager.getPrefsLastStoragesConfiguration());
     }
