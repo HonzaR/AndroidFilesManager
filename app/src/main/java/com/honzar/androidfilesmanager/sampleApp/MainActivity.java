@@ -22,7 +22,9 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import java.io.File;
 import java.io.StringReader;
+import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -97,8 +99,11 @@ public class MainActivity extends AppCompatActivity {
         btnTest1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                manager.createEmptyDir("slozka", "sloziii");
-                manager.createEmptyFile("slozka/slozenka", "file44");
+
+                LinkedList<File> files = manager.getAllFilesFromDir(null);
+                for (File f : files) {
+                    Log.d("files", "file: " + f.getName());
+                }
             }
         });
 

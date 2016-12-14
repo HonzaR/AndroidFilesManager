@@ -23,7 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -288,7 +288,7 @@ public class FilesManager {
      * @param path local directory path
      * @return all files from directory.
      */
-    public ArrayList<File> getAllFilesFromDir(String path)
+    public LinkedList<File> getAllFilesFromDir(String path)
     {
         return getAllFilesFromDir(path, DEFAULT_STORAGE);
     }
@@ -299,16 +299,16 @@ public class FilesManager {
      * @param storageId preferred storage
      * @return all files from directory.
      */
-    public ArrayList<File> getAllFilesFromDir(String path, int storageId)
+    public LinkedList<File> getAllFilesFromDir(String path, int storageId)
     {
-        ArrayList<File> inFiles = new ArrayList<>();
+        LinkedList<File> inFiles;
 
         String storageToBeUsed = getStoragePath(storageId);
 
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(storageToBeUsed, path);
 
-        inFiles = (ArrayList<File>) FileUtils.listFiles(new File(path), null, true);
+        inFiles = (LinkedList<File>) FileUtils.listFiles(new File(path), null, true);
 
         return inFiles;
     }
@@ -317,7 +317,7 @@ public class FilesManager {
      * Returns all files from external storage.
      * @return all files from external storage.
      */
-    public ArrayList<File> getAllFileFromExternalStorage()
+    public LinkedList<File> getAllFileFromExternalStorage()
     {
         return getAllFilesFromDir(null, EXTERNAL_STORAGE);
     }
@@ -326,7 +326,7 @@ public class FilesManager {
      * Returns all files from internal storage.
      * @return all files from internal storage.
      */
-    public ArrayList<File> getAllFilesFromInternalStorage()
+    public LinkedList<File> getAllFilesFromInternalStorage()
     {
         return getAllFilesFromDir(null, INTERNAL_STORAGE);
     }
@@ -335,7 +335,7 @@ public class FilesManager {
      * Returns all files from currently chosen storage.
      * @return all files from currently chosen storage.
      */
-    public ArrayList<File> getAllFileFromCurrentStorage()
+    public LinkedList<File> getAllFileFromCurrentStorage()
     {
         return getAllFilesFromDir(null, DEFAULT_STORAGE);
     }
