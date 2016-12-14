@@ -301,14 +301,17 @@ public class FilesManager {
      */
     public LinkedList<File> getAllFilesFromDir(String path, int storageId)
     {
-        LinkedList<File> inFiles;
+        LinkedList<File> inFiles = new LinkedList<>();
 
         String storageToBeUsed = getStoragePath(storageId);
 
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(storageToBeUsed, path);
 
-        inFiles = (LinkedList<File>) FileUtils.listFiles(new File(path), null, true);
+        File dir = new File(path);
+        if (dir.exists()) {
+            inFiles = (LinkedList<File>) FileUtils.listFiles(new File(path), null, true);
+        }
 
         return inFiles;
     }

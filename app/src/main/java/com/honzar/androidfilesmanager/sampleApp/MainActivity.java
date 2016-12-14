@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                LinkedList<File> files = manager.getAllFilesFromDir(null);
+                LinkedList<File> files = manager.getAllFilesFromDir("slozka");
                 for (File f : files) {
                     Log.d("files", "file: " + f.getName());
                 }
