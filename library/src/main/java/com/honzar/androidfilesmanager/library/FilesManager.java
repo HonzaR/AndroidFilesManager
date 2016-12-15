@@ -421,6 +421,23 @@ public class FilesManager {
     //
 
     /**
+     * Checks if file exists.
+     * @param file
+     * @return true if file exists, false otherwise.
+     */
+    public boolean checkFileExists(File file)
+    {
+        try {
+            if (file.exists())
+                return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Checks if file exists on selected path.
      * @param fileName
      * @param path

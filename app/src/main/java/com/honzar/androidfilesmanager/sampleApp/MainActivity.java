@@ -115,6 +115,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest3 = (Button) findViewById(R.id.btn_test_3);
+        btnTest3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(mContext, "result: " + manager.checkFileExists(new File(manager.getCurrentStorage() + "b.txt")), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {
