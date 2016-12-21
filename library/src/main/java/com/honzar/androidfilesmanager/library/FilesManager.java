@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -413,9 +415,11 @@ public class FilesManager {
         destDir = addDirectoryToStoragePath(storageToBeUsed, destDir);
 
         try {
-            FileUtils.copyFile(new File(sourceUri.getPath()), new File(destDir, fileName), true);
+            FileUtils.copyFile(new File(new URI(sourceUri.toString())), new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
