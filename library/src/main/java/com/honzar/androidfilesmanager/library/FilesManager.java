@@ -18,11 +18,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -397,24 +395,32 @@ public class FilesManager {
      */
     public boolean copyFile(Uri sourceUri, String fileName, String destDir)
     {
-        destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
-        destDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), destDir);
-
-        try {
-            File source = new File(sourceUri.getPath());
-            FileChannel src = new FileInputStream(source).getChannel();
-            FileChannel dst = new FileOutputStream(new File(destDir, fileName)).getChannel();
-            dst.transferFrom(src, 0, src.size());
-            src.close();
-            dst.close();
-            return true;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return false;
+        return copyFile(sourceUri, fileName, destDir, DEFAULT_STORAGE);
     }
 
+    /**
+     * Copies file from one source URI to file on selected path.
+     * @param sourceUri
+     * @param fileName
+     * @param destDir
+     * @param storageId
+     * @return true if succeed, false otherwise.
+     */
+    public boolean copyFile(Uri sourceUri, String fileName, String destDir, int storageId)
+    {
+        destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
+        String storageToBeUsed = getStoragePath(storageId);
+        destDir = addDirectoryToStoragePath(storageToBeUsed, destDir);
 
+        try {
+            FileUtils.copyFile(new File(sourceUri.getPath()), new File(destDir, fileName), true);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
     //
     //  FILE METHODS
