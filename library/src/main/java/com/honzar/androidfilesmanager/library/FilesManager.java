@@ -1,7 +1,6 @@
 package com.honzar.androidfilesmanager.library;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -21,8 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -390,36 +387,34 @@ public class FilesManager {
 
     /**
      * Copies file from one source URI to file on selected path.
-     * @param sourceUri
+     * @param srcFile
      * @param fileName
      * @param destDir
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(Uri sourceUri, String fileName, String destDir)
+    public boolean copyFile(File srcFile, String fileName, String destDir)
     {
-        return copyFile(sourceUri, fileName, destDir, DEFAULT_STORAGE);
+        return copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE);
     }
 
     /**
      * Copies file from one source URI to file on selected path.
-     * @param sourceUri
+     * @param srcFile
      * @param fileName
      * @param destDir
      * @param storageId
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(Uri sourceUri, String fileName, String destDir, int storageId)
+    public boolean copyFile(File srcFile, String fileName, String destDir, int storageId)
     {
         destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
         String storageToBeUsed = getStoragePath(storageId);
         destDir = addDirectoryToStoragePath(storageToBeUsed, destDir);
 
         try {
-            FileUtils.copyFile(new File(new URI(sourceUri.toString())), new File(destDir, fileName), true);
+            FileUtils.copyFile(srcFile, new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
