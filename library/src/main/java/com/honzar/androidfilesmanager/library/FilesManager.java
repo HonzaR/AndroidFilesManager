@@ -19,8 +19,11 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
@@ -864,6 +867,30 @@ public class FilesManager {
             out.write(data.getBytes());
             out.close();
             return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Writes Uri data to file.
+     * @param file
+     * @param data
+     * @return true if succeed, false otherwise.
+     */
+    public boolean writeStringToFile(File file, Uri data)
+    {
+        InputStream initialStream = null;
+        try {
+            initialStream = mContext.getContentResolver().openInputStream(data);
+            byte[] buffer = new byte[initialStream.available()];
+            initialStream.read(buffer);
+            OutputStream outStream = new FileOutputStream(file);
+            outStream.write(buffer);
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
