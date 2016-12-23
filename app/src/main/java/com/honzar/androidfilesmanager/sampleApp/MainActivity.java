@@ -123,6 +123,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest4 = (Button) findViewById(R.id.btn_test_4);
+        btnTest4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse("content://com.android.providers.media.documents/document/image%3A205044");
+                manager.copyFilePersistingExifData(uri, "exif.jpeg", null);
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {

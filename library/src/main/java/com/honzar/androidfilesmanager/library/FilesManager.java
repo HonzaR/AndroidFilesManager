@@ -1,12 +1,16 @@
 package com.honzar.androidfilesmanager.library;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.util.Xml;
 
@@ -393,15 +397,41 @@ public class FilesManager {
     }
 
     /**
-     * Copies file from one source URI to file on selected path.
-     * @param srcFile
+     * Copies file from one source to file on selected path persisting photo exif data.
+     * @param uri
      * @param fileName
      * @param destDir
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(File srcFile, String fileName, String destDir)
+    public boolean copyFilePersistingExifData(Uri uri, String fileName, String destDir)
     {
-        return copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE);
+        ExifInterface exifData = null;
+        String exifOrientation = null;
+
+        String path = getRealPathFromURI(uri);
+        File srcFile = new File(path);
+
+        try {   // persist exif photo data
+            exifData = new ExifInterface(srcFile.getAbsolutePath());
+            exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE)) {
+
+            if (exifOrientation != null) {
+                try {
+                    ExifInterface newExif = new ExifInterface(getFile(destDir, fileName).getAbsolutePath());
+                    newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+                    newExif.saveAttributes();
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -899,47 +929,6 @@ public class FilesManager {
     }
 
     /**
-     * Writes Uri data to file with persisting exif photo data.
-     * @param file
-     * @param data
-     * @return true if succeed, false otherwise.
-     */
-    public boolean writeDataFromUriToFilePersistingExifData(File file, Uri data)
-    {
-        InputStream initialStream = null;
-        ExifInterface exifData = null;
-        String exifOrientation = null;
-        try {
-
-            try {   // persist exif photo data
-                exifData = new ExifInterface(data.toString());
-                exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            initialStream = mContext.getContentResolver().openInputStream(data);
-            byte[] buffer = new byte[initialStream.available()];
-            initialStream.read(buffer);
-            OutputStream outStream = new FileOutputStream(file);
-            outStream.write(buffer);
-
-            if (exifOrientation != null) {
-                ExifInterface newExif = new ExifInterface(file.getAbsolutePath());
-                newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
-                newExif.saveAttributes();
-            }
-
-            return true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
      * Writes Json data to file.
      * @param file
      * @param data
@@ -1102,6 +1091,70 @@ public class FilesManager {
         }
         return null;
     }
+
+
+    /**
+     * Returns real string path from URI
+     * @param contentUri
+     * @return String file path.
+     */
+    public static String getRealPathFromURI(Uri contentUri)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return getPathForV19AndUp(contentUri);
+        } else {
+            return getPathForPreV19(contentUri);
+        }
+    }
+
+
+    public static String getPathForPreV19(Uri contentUri)
+    {
+        String res = null;
+
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = mContext.getContentResolver().query(contentUri, proj, null, null, null);
+
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                res = cursor.getString(column_index);
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static String getPathForV19AndUp(Uri contentUri)
+    {
+        String wholeID = DocumentsContract.getDocumentId(contentUri);
+
+        // Split at colon, use second item in the array
+        String id = wholeID.split(":")[1];
+        String[] column = { MediaStore.Images.Media.DATA };
+
+        // where id is equal to
+        String sel = MediaStore.Images.Media._ID + "=?";
+        Cursor cursor = mContext.getContentResolver().
+                query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        column, sel, new String[]{ id }, null);
+
+        String filePath = "";
+        int columnIndex = cursor.getColumnIndex(column[0]);
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+
+        cursor.close();
+        return filePath;
+    }
+
+
 
     //
     //  INNER CLASS
