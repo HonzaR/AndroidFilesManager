@@ -1,6 +1,7 @@
 package com.honzar.androidfilesmanager.library;
 
 import android.content.Context;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -879,7 +880,7 @@ public class FilesManager {
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeStringToFile(File file, Uri data)
+    public boolean writeDataFromUriToFile(File file, Uri data)
     {
         InputStream initialStream = null;
         try {
@@ -888,6 +889,47 @@ public class FilesManager {
             initialStream.read(buffer);
             OutputStream outStream = new FileOutputStream(file);
             outStream.write(buffer);
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Writes Uri data to file with persisting exif photo data.
+     * @param file
+     * @param data
+     * @return true if succeed, false otherwise.
+     */
+    public boolean writeDataFromUriToFilePersistingExifData(File file, Uri data)
+    {
+        InputStream initialStream = null;
+        ExifInterface exifData = null;
+        String exifOrientation = null;
+        try {
+
+            try {   // persist exif photo data
+                exifData = new ExifInterface(data.toString());
+                exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            initialStream = mContext.getContentResolver().openInputStream(data);
+            byte[] buffer = new byte[initialStream.available()];
+            initialStream.read(buffer);
+            OutputStream outStream = new FileOutputStream(file);
+            outStream.write(buffer);
+
+            if (exifOrientation != null) {
+                ExifInterface newExif = new ExifInterface(file.getAbsolutePath());
+                newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+                newExif.saveAttributes();
+            }
+
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
