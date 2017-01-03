@@ -414,6 +414,9 @@ public class FilesManager {
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
             return false;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
         }
         File srcFile = new File(path);
 
@@ -1104,7 +1107,7 @@ public class FilesManager {
      * @param contentUri
      * @return String file path.
      */
-    public static String getRealPathFromURI(Uri contentUri) throws ArrayIndexOutOfBoundsException
+    public static String getRealPathFromURI(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return getPathForV19AndUp(contentUri);
@@ -1114,7 +1117,7 @@ public class FilesManager {
     }
 
 
-    public static String getPathForPreV19(Uri contentUri) throws ArrayIndexOutOfBoundsException
+    public static String getPathForPreV19(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
     {
         String res = null;
 
@@ -1136,7 +1139,7 @@ public class FilesManager {
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getPathForV19AndUp(Uri contentUri) throws ArrayIndexOutOfBoundsException
+    public static String getPathForV19AndUp(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
     {
         String wholeID = DocumentsContract.getDocumentId(contentUri);
 
