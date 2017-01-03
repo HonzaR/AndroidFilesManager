@@ -408,7 +408,13 @@ public class FilesManager {
         ExifInterface exifData = null;
         String exifOrientation = null;
 
-        String path = getRealPathFromURI(uri);
+        String path;
+        try {
+            path = getRealPathFromURI(uri);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return false;
+        }
         File srcFile = new File(path);
 
         try {   // persist exif photo data
@@ -1098,7 +1104,7 @@ public class FilesManager {
      * @param contentUri
      * @return String file path.
      */
-    public static String getRealPathFromURI(Uri contentUri)
+    public static String getRealPathFromURI(Uri contentUri) throws ArrayIndexOutOfBoundsException
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return getPathForV19AndUp(contentUri);
@@ -1108,7 +1114,7 @@ public class FilesManager {
     }
 
 
-    public static String getPathForPreV19(Uri contentUri)
+    public static String getPathForPreV19(Uri contentUri) throws ArrayIndexOutOfBoundsException
     {
         String res = null;
 
@@ -1130,7 +1136,7 @@ public class FilesManager {
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getPathForV19AndUp(Uri contentUri)
+    public static String getPathForV19AndUp(Uri contentUri) throws ArrayIndexOutOfBoundsException
     {
         String wholeID = DocumentsContract.getDocumentId(contentUri);
 
