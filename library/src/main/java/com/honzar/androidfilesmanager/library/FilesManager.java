@@ -437,6 +437,9 @@ public class FilesManager {
                     return true;
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (UnsupportedOperationException e) { // caused by .png files, which don't work with exif
+                    e.printStackTrace();
+                    return true;
                 }
             }
         }
