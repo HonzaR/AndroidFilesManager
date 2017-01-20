@@ -132,6 +132,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest5 = (Button) findViewById(R.id.btn_test_5);
+        btnTest5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager.copyFileToAbsolutePath("bbb.jpg", "aaa", "/storage/emulated/0/Pictures/TERMINator/");
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {

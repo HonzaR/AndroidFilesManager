@@ -397,6 +397,28 @@ public class FilesManager {
     }
 
     /**
+     * Copies file from one directory to absolute path.
+     * @param fileName
+     * @param srcDir
+     * @param destAbsolutePath
+     * @return true if succeed, false otherwise.
+     */
+    public boolean copyFileToAbsolutePath(String fileName, String srcDir, String destAbsolutePath)
+    {
+        srcDir = (srcDir != null) ? addSlashToPathIfNeeded(srcDir) : "";
+        srcDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), srcDir);
+
+        try {
+            FileUtils.copyFile(new File(srcDir, fileName), new File(destAbsolutePath, fileName), true);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
      * Copies file from one source to file on selected path persisting photo exif data.
      * @param uri
      * @param fileName
