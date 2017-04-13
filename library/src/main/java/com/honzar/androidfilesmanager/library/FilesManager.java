@@ -1,6 +1,6 @@
 package com.honzar.androidfilesmanager.library;
 
-import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.ExifInterface;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 
@@ -57,6 +58,7 @@ public class FilesManager {
     public static final int EXTERNAL_STORAGE = 2;
 
     private static final int EXTERNAL_TO_INTERNAL_STORAGE_RATIO = 2;
+    private static final String TAG = FilesManager.class.getName();
 
     private static FilesManager instance;
     private static Context mContext;
@@ -221,7 +223,7 @@ public class FilesManager {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         return availableSpace;
@@ -390,7 +392,7 @@ public class FilesManager {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return false;
@@ -412,7 +414,7 @@ public class FilesManager {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destAbsolutePath, fileName), true);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return false;
@@ -430,23 +432,24 @@ public class FilesManager {
         ExifInterface exifData = null;
         String exifOrientation = null;
 
-        String path;
+        String path = null;
         try {
             path = getRealPathFromURI(uri);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        } catch (URISyntaxException urie) {
+            //urie.printStackTrace();
+        }
+
+        if (path == null) {
             return false;
         }
+
         File srcFile = new File(path);
 
         try {   // persist exif photo data
             exifData = new ExifInterface(srcFile.getAbsolutePath());
             exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {   // may be caused by .png files, which don't work with exif
+            //ioe.printStackTrace();
         }
 
         if (copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE)) {
@@ -457,10 +460,11 @@ public class FilesManager {
                     newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
                     newExif.saveAttributes();
                     return true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedOperationException e) { // caused by .png files, which don't work with exif
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    //ioe.printStackTrace();
+                    return true;
+                } catch (UnsupportedOperationException unsupoe) {
+                    //unsupoe.printStackTrace();
                     return true;
                 }
             }
@@ -486,7 +490,7 @@ public class FilesManager {
             FileUtils.copyFile(srcFile, new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return false;
@@ -513,7 +517,7 @@ public class FilesManager {
             dst.close();
             return true;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
         return false;
     }
@@ -534,7 +538,7 @@ public class FilesManager {
                 return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -557,7 +561,7 @@ public class FilesManager {
                 return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -596,7 +600,7 @@ public class FilesManager {
                 return file;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return null;
@@ -702,7 +706,7 @@ public class FilesManager {
         try {
             FileUtils.deleteDirectory(new File(path));
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
 
@@ -774,7 +778,7 @@ public class FilesManager {
         try {
             FileUtils.deleteDirectory(new File(storage));
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
 
@@ -933,7 +937,7 @@ public class FilesManager {
             out.close();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -955,9 +959,9 @@ public class FilesManager {
             outStream.write(buffer);
             return true;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -976,7 +980,7 @@ public class FilesManager {
             out.close();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -1007,11 +1011,11 @@ public class FilesManager {
             return true;
 
         } catch (TransformerConfigurationException tce) {
-            tce.printStackTrace();
+            //tce.printStackTrace();
         } catch (TransformerException tce) {
-            tce.printStackTrace();
+            //tce.printStackTrace();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            //ioe.printStackTrace();
         }
 
 
@@ -1032,7 +1036,7 @@ public class FilesManager {
             out.close();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return false;
     }
@@ -1054,7 +1058,7 @@ public class FilesManager {
             try {
                 return FileUtils.readFileToString(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         return null;
@@ -1073,7 +1077,7 @@ public class FilesManager {
             return (res != null) ? new JSONObject(res) : null;
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return null;
     }
@@ -1098,11 +1102,11 @@ public class FilesManager {
                 return builder.parse(new ByteArrayInputStream(content.getBytes()));
 
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                //ioe.printStackTrace();
             } catch (ParserConfigurationException pce) {
-                pce.printStackTrace();
+                //pce.printStackTrace();
             } catch (SAXException se) {
-                se.printStackTrace();
+                //se.printStackTrace();
             }
         }
         return null;
@@ -1120,7 +1124,7 @@ public class FilesManager {
             try {
                 return FileUtils.readFileToByteArray(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         return null;
@@ -1132,63 +1136,79 @@ public class FilesManager {
      * @param contentUri
      * @return String file path.
      */
-    public static String getRealPathFromURI(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
+    private static String getRealPathFromURI(Uri contentUri) throws URISyntaxException
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return getPathForV19AndUp(contentUri);
-        } else {
-            return getPathForPreV19(contentUri);
+        String selection = null;
+        String[] selectionArgs = null;
+
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        if (Build.VERSION.SDK_INT >= 19 && DocumentsContract.isDocumentUri(mContext, contentUri)) {
+
+            if (isExternalStorageDocument(contentUri)) {
+                final String docId = DocumentsContract.getDocumentId(contentUri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+
+            } else if (isDownloadsDocument(contentUri)) {
+                final String id = DocumentsContract.getDocumentId(contentUri);
+                contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+            } else if (isMediaDocument(contentUri)) {
+                final String docId = DocumentsContract.getDocumentId(contentUri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                selection = "_id=?";
+                selectionArgs = new String[]{
+                        split[1]
+                };
+            }
         }
-    }
 
+        if ("content".equalsIgnoreCase(contentUri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
 
-    public static String getPathForPreV19(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
-    {
-        String res = null;
-
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = mContext.getContentResolver().query(contentUri, proj, null, null, null);
-
-        try {
-            if (cursor != null && cursor.moveToFirst()) {
+            Cursor cursor = null;
+            try {
+                cursor = mContext.getContentResolver().query(contentUri, projection, selection, selectionArgs, null);
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                res = cursor.getString(column_index);
+                if (cursor.moveToFirst()) {
+                    String str = cursor.getString(column_index);
+                    cursor.close();
+                    return str;
+                }
+            } catch (NullPointerException e) {
+                //e.printStackTrace();
             }
-            if (cursor != null) {
-                cursor.close();
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getPathForV19AndUp(Uri contentUri) throws ArrayIndexOutOfBoundsException, IllegalArgumentException
-    {
-        String wholeID = DocumentsContract.getDocumentId(contentUri);
-
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
-        String[] column = { MediaStore.Images.Media.DATA };
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-        Cursor cursor = mContext.getContentResolver().
-                query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        column, sel, new String[]{ id }, null);
-
-        String filePath = "";
-        int columnIndex = cursor.getColumnIndex(column[0]);
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
+        } else if ("file".equalsIgnoreCase(contentUri.getScheme())) {
+            return contentUri.getPath();
         }
 
-        cursor.close();
-        return filePath;
+        return null;
     }
 
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
 
+    private static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    private static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
 
     //
     //  INNER CLASS
@@ -1241,7 +1261,7 @@ public class FilesManager {
                 FileUtils.deleteDirectory(new File(from));
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 this.lastException = e;
                 return false;
             }

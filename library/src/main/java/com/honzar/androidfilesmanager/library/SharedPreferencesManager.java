@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
  * honzar@appsdevteam.com
  */
 
-public class SharedPreferencesManager {
+class SharedPreferencesManager {
 
     public static final String PREFS_NONE = "none";
     public static final int PREFS_NONE_NUM = -1;

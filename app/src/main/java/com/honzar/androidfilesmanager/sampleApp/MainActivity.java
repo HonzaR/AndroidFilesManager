@@ -2,6 +2,7 @@ package com.honzar.androidfilesmanager.sampleApp;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -140,6 +141,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest6 = (Button) findViewById(R.id.btn_test_6);
+        btnTest6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent();
+                i.setType("image/*");
+                i.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(i, "Select Picture"), 0);
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {
@@ -173,6 +185,16 @@ public class MainActivity extends AppCompatActivity {
 
         manager.copyFile(Uri.fromFile(manager.getFile("renameDir", "b.txt")), "b.txt", null);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (data != null) {
+            final Uri resultUri = data.getData();
+            manager.copyFilePersistingExifData(resultUri, "image_pick_copy.jpeg", null);
+        }
     }
 
     public void onAskStorageMove(int storageId)
