@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        manager = FilesManager.getInstance(mContext);
+        manager = FilesManager.getInstance(mContext, BuildConfig.DEBUG);
         if (manager.checkIfStoragesChanged() || !manager.isOptimalStorageUsed()) {
 
             new AlertDialog.Builder(mContext)
@@ -149,6 +149,14 @@ public class MainActivity extends AppCompatActivity {
                 i.setType("image/*");
                 i.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(i, "Select Picture"), 0);
+            }
+        });
+
+        Button btnTest7 = (Button) findViewById(R.id.btn_test_7);
+        btnTest7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

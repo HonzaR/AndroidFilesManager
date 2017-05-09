@@ -45,6 +45,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import timber.log.Timber;
+
 /**
  * Created by Honza Rychnovský on 3.11.2016.
  * AppsDevTeam
@@ -73,12 +75,17 @@ public class FilesManager {
      * @param c context
      * @return FilesManager instance
      */
-    public static FilesManager getInstance(Context c)
+    public static FilesManager getInstance(Context c, boolean allowLogging)
     {
         if (instance == null) {
             instance = new FilesManager(c);
         }
         mContext = c;
+
+        if (allowLogging) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
         return instance;
     }
 
@@ -109,7 +116,6 @@ public class FilesManager {
             prefsManager.saveStoragesConfiguration(getStoragesConfiguration());
         }
     }
-
 
     //
     // PRIVATE METHODS
@@ -223,7 +229,7 @@ public class FilesManager {
                 }
 
             } catch (Exception e) {
-                //e.printStackTrace();
+                Timber.e(e);
             }
         }
         return availableSpace;
@@ -392,7 +398,7 @@ public class FilesManager {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
 
         return false;
@@ -414,7 +420,7 @@ public class FilesManager {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destAbsolutePath, fileName), true);
             return true;
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
 
         return false;
@@ -436,7 +442,7 @@ public class FilesManager {
         try {
             path = getRealPathFromURI(uri);
         } catch (URISyntaxException urie) {
-            //urie.printStackTrace();
+            Timber.e(urie);
         }
 
         if (path == null) {
@@ -449,7 +455,7 @@ public class FilesManager {
             exifData = new ExifInterface(srcFile.getAbsolutePath());
             exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
         } catch (IOException ioe) {   // may be caused by .png files, which don't work with exif
-            //ioe.printStackTrace();
+            Timber.e(ioe);
         }
 
         if (copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE)) {
@@ -461,10 +467,10 @@ public class FilesManager {
                     newExif.saveAttributes();
                     return true;
                 } catch (IOException ioe) {
-                    //ioe.printStackTrace();
+                    Timber.e(ioe);
                     return true;
                 } catch (UnsupportedOperationException unsupoe) {
-                    //unsupoe.printStackTrace();
+                    Timber.e(unsupoe);
                     return true;
                 }
             }
@@ -490,7 +496,7 @@ public class FilesManager {
             FileUtils.copyFile(srcFile, new File(destDir, fileName), true);
             return true;
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
 
         return false;
@@ -517,7 +523,7 @@ public class FilesManager {
             dst.close();
             return true;
         } catch (IOException ex) {
-            //ex.printStackTrace();
+            Timber.e(ex);
         }
         return false;
     }
@@ -538,7 +544,7 @@ public class FilesManager {
                 return true;
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return false;
     }
@@ -561,7 +567,7 @@ public class FilesManager {
                 return true;
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return false;
     }
@@ -600,7 +606,7 @@ public class FilesManager {
                 return file;
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
 
         return null;
@@ -706,7 +712,7 @@ public class FilesManager {
         try {
             FileUtils.deleteDirectory(new File(path));
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
             return false;
         }
 
@@ -778,7 +784,7 @@ public class FilesManager {
         try {
             FileUtils.deleteDirectory(new File(storage));
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
             return false;
         }
 
@@ -937,7 +943,7 @@ public class FilesManager {
             out.close();
             return true;
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return false;
     }
@@ -959,9 +965,9 @@ public class FilesManager {
             outStream.write(buffer);
             return true;
         } catch (FileNotFoundException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return false;
     }
@@ -980,7 +986,7 @@ public class FilesManager {
             out.close();
             return true;
         } catch (IOException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return false;
     }
@@ -1011,11 +1017,11 @@ public class FilesManager {
             return true;
 
         } catch (TransformerConfigurationException tce) {
-            //tce.printStackTrace();
+            Timber.e(tce);
         } catch (TransformerException tce) {
-            //tce.printStackTrace();
+            Timber.e(tce);
         } catch (IOException ioe) {
-            //ioe.printStackTrace();
+            Timber.e(ioe);
         }
 
 
@@ -1035,8 +1041,8 @@ public class FilesManager {
             out.write(data);
             out.close();
             return true;
-        } catch (IOException e) {
-            //e.printStackTrace();
+        } catch (Exception e) {
+            Timber.e(e);
         }
         return false;
     }
@@ -1058,7 +1064,7 @@ public class FilesManager {
             try {
                 return FileUtils.readFileToString(file);
             } catch (IOException e) {
-                //e.printStackTrace();
+                Timber.e(e);
             }
         }
         return null;
@@ -1077,7 +1083,7 @@ public class FilesManager {
             return (res != null) ? new JSONObject(res) : null;
 
         } catch (JSONException e) {
-            //e.printStackTrace();
+            Timber.e(e);
         }
         return null;
     }
@@ -1102,11 +1108,11 @@ public class FilesManager {
                 return builder.parse(new ByteArrayInputStream(content.getBytes()));
 
             } catch (IOException ioe) {
-                //ioe.printStackTrace();
+                Timber.e(ioe);
             } catch (ParserConfigurationException pce) {
-                //pce.printStackTrace();
+                Timber.e(pce);
             } catch (SAXException se) {
-                //se.printStackTrace();
+                Timber.e(se);
             }
         }
         return null;
@@ -1124,7 +1130,7 @@ public class FilesManager {
             try {
                 return FileUtils.readFileToByteArray(file);
             } catch (IOException e) {
-                //e.printStackTrace();
+                Timber.e(e);
             }
         }
         return null;
@@ -1188,7 +1194,7 @@ public class FilesManager {
                     return str;
                 }
             } catch (NullPointerException e) {
-                //e.printStackTrace();
+                Timber.e(e);
             }
 
         } else if ("file".equalsIgnoreCase(contentUri.getScheme())) {
@@ -1261,7 +1267,7 @@ public class FilesManager {
                 FileUtils.deleteDirectory(new File(from));
                 return true;
             } catch (Exception e) {
-                //e.printStackTrace();
+                Timber.e(e);
                 this.lastException = e;
                 return false;
             }
