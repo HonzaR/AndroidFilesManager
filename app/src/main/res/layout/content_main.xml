@@ -68,4 +68,11 @@
         android:layout_height="wrap_content"
         android:text="test #7"/>
 
+    <Button
+        android:id="@+id/btn_test_8"
+        android:layout_below="@+id/btn_test_7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test #8"/>
+
 </RelativeLayout>

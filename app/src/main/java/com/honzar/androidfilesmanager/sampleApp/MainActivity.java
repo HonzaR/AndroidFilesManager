@@ -164,6 +164,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest8 = (Button) findViewById(R.id.btn_test_8);
+        btnTest8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager.extractFilesFromZip(null, manager.getFile("test_zip.zip"), "test");
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {

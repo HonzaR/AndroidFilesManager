@@ -241,6 +241,18 @@ public class FilesManager {
         return availableSpace;
     }
 
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    private static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    private static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
 
     //
     //  GET FILES METHODS
@@ -1323,17 +1335,19 @@ public class FilesManager {
         return null;
     }
 
-    private static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    //
+    // COMMON METHODS
+    //
+
+    /**
+     * Returns file prefix according to SDK version
+     *
+     * @return files prefix
+     */
+    public static String getFilesPrefix() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ? "content://" : "file://";
     }
 
-    private static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    private static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
 
     //
     //  INNER CLASS
