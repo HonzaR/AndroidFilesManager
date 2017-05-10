@@ -1,7 +1,9 @@
 package com.honzar.androidfilesmanager.library;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.media.ExifInterface;
@@ -1453,19 +1455,20 @@ public class FilesManager {
     }
 
     /**
-     * Returns list of paths to files on the given path in asset folder
+     * Copy directory and its content from assets to storage on the given output directory
      *
-     * @param path
+     * @param assetDirPath
+     * @param outputDirectory
      *
-     * @return list of paths to files in asset folder or empty list in case of error or empty folder in path
+     * @return true in case of success, false otherwise
      */
-    public boolean copyDirectoryWithContentFromAssets(String path, String outputDirectory)
+    public boolean copyDirectoryWithContentFromAssets(String assetDirPath, String outputDirectory)
     {
-        if (mContext == null || path == null || path.isEmpty()) {
+        if (mContext == null || assetDirPath == null || assetDirPath.isEmpty()) {
             return false;
         }
 
-        String assets[] = getArrayOfAssetFilesPaths(path);
+        String assets[] = getArrayOfAssetFilesPaths(assetDirPath);
         try {
             for (int i = 0; i < assets.length; ++i) {
                 copyFileFromAssets(assets[i], outputDirectory);
@@ -1491,7 +1494,34 @@ public class FilesManager {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ? "content://" : "file://";
     }
 
+    /**
+     * Adds image file to gallery
+     *
+     * @param photoWholeUrl
+     *
+     * @return true in case of success, false otherwise
+     */
+    public static boolean addPhotoToGallery(String photoWholeUrl)
+    {
+        if (mContext == null || photoWholeUrl == null || photoWholeUrl.isEmpty()) {
+            return false;
+        }
 
+        ContentValues values = new ContentValues();
+
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, photoWholeUrl);
+
+        mContext.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(photoWholeUrl);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        mContext.sendBroadcast(mediaScanIntent);
+        return true;
+    }
 
     //
     //  INNER CLASS
