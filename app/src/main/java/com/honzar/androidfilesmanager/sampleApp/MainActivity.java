@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                manager.moveStorageToInternal(new FilesManager.OptimalStorageMoveInterface() {
+                manager.moveStorageToExternal(new FilesManager.OptimalStorageMoveInterface() {
                     @Override
                     public void moveStorageStarts(FilesManager.MoveStorageTask task) {
                         Toast.makeText(mContext, getString(R.string.task_move_storage_start), Toast.LENGTH_LONG).show();
@@ -156,7 +156,11 @@ public class MainActivity extends AppCompatActivity {
         btnTest7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                File folder = manager.createEmptyDir(null, "testDir");
+                manager.createEmptyFile("testDir", "a.txt");
+                manager.createEmptyFile("testDir", "b.txt");
+                manager.createEmptyFile("testDir", "c.txt");
+                manager.compressFilesToZip(folder, "", "test_zip", "test");
             }
         });
 
@@ -186,12 +190,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        manager.createEmptyDir(null, "renameDir");
-        manager.createEmptyFile("renameDir", "a.txt");
-        manager.renameFile("renameDir", "a.txt", "b.txt");
-
-        manager.copyFile(Uri.fromFile(manager.getFile("renameDir", "b.txt")), "b.txt", null);
 
     }
 

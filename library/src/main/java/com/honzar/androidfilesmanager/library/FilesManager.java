@@ -14,6 +14,10 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.util.Xml;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +36,9 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -1041,6 +1047,119 @@ public class FilesManager {
             out.write(data);
             out.close();
             return true;
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
+    }
+
+    //
+    // ZIP METHODS
+    //
+
+    /**
+     * Compress list of files from folder to zip archive on the defined name and path
+     *
+     * @param folder
+     * @param zipFilePath
+     * @param zipFileName name of file ending with ".zip"
+     * @param password optional password
+     *
+     * @return true if succeed, false otherwise.
+     */
+    public boolean compressFilesToZip(File folder, String zipFilePath, String zipFileName, String password)
+    {
+        if (folder == null || !folder.isDirectory()) {
+            return false;
+        }
+        return compressFilesToZip(Arrays.asList(folder.listFiles()), zipFilePath, zipFileName, password);
+    }
+
+    /**
+     * Compress list of files to zip archive on the defined name and path
+     *
+     * @param files
+     * @param zipFilePath
+     * @param zipFileName name of file ending with ".zip"
+     * @param password optional password
+     *
+     * @return true if succeed, false otherwise.
+     */
+    public boolean compressFilesToZip(List<File> files, String zipFilePath, String zipFileName, String password)
+    {
+        if (zipFileName == null || zipFileName.isEmpty()) {
+            return false;
+        }
+        if (!zipFileName.endsWith(".zip")) {
+            zipFileName = zipFileName.concat(".zip");
+        }
+
+        zipFilePath = (zipFilePath != null) ? addSlashToPathIfNeeded(zipFilePath) : "";
+
+        String storageToBeUsed = getStoragePath(DEFAULT_STORAGE);
+        zipFilePath = addDirectoryToStoragePath(storageToBeUsed, zipFilePath);
+
+        try {
+
+            ZipParameters parameters = new ZipParameters();
+            parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+            parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+
+            if (password != null && password.length() > 0) {
+
+                parameters.setEncryptFiles(true);
+                parameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_AES);
+                parameters.setAesKeyStrength(Zip4jConstants.AES_STRENGTH_256);
+                parameters.setPassword(password);
+            }
+
+            ZipFile zipFile = new ZipFile(new File(zipFilePath, zipFileName));
+
+            for (File f : files) {
+
+                if (f.isFile()) {
+                    zipFile.addFile(f, parameters);
+                } else if (f.isDirectory()) {
+                    zipFile.addFolder(f, parameters);
+                }
+            }
+            return true;
+
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
+    }
+
+    /**
+     * Extracts list of files from zip archive to folder on defined output path
+     *
+     * @param outputPath
+     * @param zipFile
+     * @param password
+     *
+     * @return true if succeed, false otherwise.
+     */
+    public boolean extractFilesFromZip(String outputPath, File zipFile, String password)
+    {
+        if (zipFile == null || !zipFile.exists()) {
+            return false;
+        }
+
+        outputPath = (outputPath != null) ? addSlashToPathIfNeeded(outputPath) : "";
+
+        String storageToBeUsed = getStoragePath(DEFAULT_STORAGE);
+        outputPath = addDirectoryToStoragePath(storageToBeUsed, outputPath);
+
+        try {
+
+            ZipFile zip = new ZipFile(zipFile);
+            if (zip.isEncrypted()) {
+                zip.setPassword(password);
+            }
+            zip.extractAll(outputPath);
+            return true;
+
         } catch (Exception e) {
             Timber.e(e);
         }
