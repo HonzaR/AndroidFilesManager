@@ -13,15 +13,8 @@
     tools:context="com.honzar.androidfilesmanager.sampleApp.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/tv_hello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
-
     <Button
         android:id="@+id/btn_test_1"
-        android:layout_below="@+id/tv_hello"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="test #1"/>
@@ -74,5 +67,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="test #8"/>
+
+    <Button
+        android:id="@+id/btn_test_9"
+        android:layout_below="@+id/btn_test_8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test #9"/>
+
+    <Button
+        android:id="@+id/btn_test_10"
+        android:layout_toEndOf="@+id/btn_test_1"
+        android:layout_toRightOf="@+id/btn_test_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test #10" />
+
+    <Button
+        android:id="@+id/btn_test_11"
+        android:layout_toEndOf="@+id/btn_test_2"
+        android:layout_toRightOf="@+id/btn_test_2"
+        android:layout_below="@+id/btn_test_10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test #11" />
 
 </RelativeLayout>

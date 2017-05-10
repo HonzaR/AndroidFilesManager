@@ -2,6 +2,7 @@ package com.honzar.androidfilesmanager.library;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -251,6 +252,12 @@ public class FilesManager {
 
     private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    private boolean ensureFoldersOnGivenPath(File path)
+    {
+        File parent = path.getParentFile();
+        return (parent != null && !parent.exists() && !parent.mkdirs());
     }
 
 
@@ -1336,6 +1343,142 @@ public class FilesManager {
     }
 
     //
+    // WORK WITH ASSETS
+    //
+
+    /**
+     * Returns array of paths to files on the given path in asset folder
+     *
+     * @param path
+     *
+     * @return array of paths to files in asset folder or empty list in case of error or empty folder in path
+     */
+    public String[] getArrayOfAssetFilesPaths(String path)
+    {
+        String[] list = new String[]{};
+
+        if (path == null) {
+            path = "";
+        }
+
+        if (mContext == null) {
+            return list;
+        }
+
+        try {
+            list = mContext.getAssets().list(path);
+        } catch (IOException e) {
+            return list;
+        }
+
+        if (!path.isEmpty()) {
+            for (int i = 0; i < list.length; i++) {
+                list[i] = path + "/" + list[i];
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Returns array of files names on the given path in asset folder
+     *
+     * @param path
+     *
+     * @return array of paths to files in asset folder or empty list in case of error or empty folder in path
+     */
+    public String[] getArrayOfAssetFilesNames(String path)
+    {
+        String[] list = new String[]{};
+
+        if (path == null) {
+            path = "";
+        }
+
+        if (mContext == null) {
+            return list;
+        }
+
+        try {
+            list = mContext.getAssets().list(path);
+        } catch (IOException e) {
+            return list;
+        }
+
+        return list;
+    }
+
+    /**
+     * Copy file from assets to storage to the output directory and with the same name
+     *
+     * @param assetFilePath
+     * @param outputDirectory
+     *
+     * @return true in case of success, false otherwise
+     */
+    public boolean copyFileFromAssets(String assetFilePath, String outputDirectory)
+    {
+        if (mContext == null || assetFilePath == null || assetFilePath.isEmpty()) {
+            return false;
+        }
+
+        outputDirectory = (outputDirectory != null) ? addSlashToPathIfNeeded(outputDirectory) : "";
+        String storageToBeUsed = getStoragePath(DEFAULT_STORAGE);
+        String outputFilePath = addDirectoryToStoragePath(storageToBeUsed, outputDirectory);
+        File outputDir = new File(outputFilePath, assetFilePath);
+        ensureFoldersOnGivenPath(outputDir);
+
+        AssetManager assetManager = mContext.getAssets();
+        InputStream in;
+        OutputStream out;
+
+        try {
+            in = assetManager.open(assetFilePath);
+            out = new FileOutputStream(outputDir);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.flush();
+            out.close();
+            return true;
+
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
+    }
+
+    /**
+     * Returns list of paths to files on the given path in asset folder
+     *
+     * @param path
+     *
+     * @return list of paths to files in asset folder or empty list in case of error or empty folder in path
+     */
+    public boolean copyDirectoryWithContentFromAssets(String path, String outputDirectory)
+    {
+        if (mContext == null || path == null || path.isEmpty()) {
+            return false;
+        }
+
+        String assets[] = getArrayOfAssetFilesPaths(path);
+        try {
+            for (int i = 0; i < assets.length; ++i) {
+                copyFileFromAssets(assets[i], outputDirectory);
+            }
+            return true;
+
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
+    }
+
+    //
     // COMMON METHODS
     //
 
@@ -1347,6 +1490,7 @@ public class FilesManager {
     public static String getFilesPrefix() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) ? "content://" : "file://";
     }
+
 
 
     //

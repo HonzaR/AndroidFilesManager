@@ -172,6 +172,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest9 = (Button) findViewById(R.id.btn_test_9);
+        btnTest9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] list = manager.getArrayOfAssetFilesPaths("test");
+                for (String s : list) {
+                    Log.d("test", "asset: " + s);
+                }
+            }
+        });
+
+        Button btnTest10 = (Button) findViewById(R.id.btn_test_10);
+        btnTest10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] list = manager.getArrayOfAssetFilesPaths("");
+                manager.copyFileFromAssets(list[0], "test_as");
+            }
+        });
+
+        Button btnTest11 = (Button) findViewById(R.id.btn_test_11);
+        btnTest11.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager.copyDirectoryWithContentFromAssets("test", "test_as_2");
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {
