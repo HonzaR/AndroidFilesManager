@@ -687,6 +687,27 @@ public class FilesManager {
     //
 
     /**
+     * Checks if directory exists.
+     * @param dir
+     * @return true if directory exists, false otherwise.
+     */
+    public boolean checkDirExists(File dir)
+    {
+        return checkFileExists(dir);
+    }
+
+    /**
+     * Checks if directory exists on selected path.
+     * @param dirName
+     * @param path
+     * @return true if directory exists, false otherwise.
+     */
+    public boolean checkDirExists(String dirName, String path)
+    {
+        return checkFileExists(dirName, path);
+    }
+
+    /**
      * Creates new empty directory with name and on selected path.
      * @param path
      * @param dirName
