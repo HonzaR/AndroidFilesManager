@@ -1,0 +1,132 @@
+{
+    "drink": [
+        {
+            "id": 1,
+            "name": "Ostatní tekutiny",
+            "unit": {
+                "fraction": "dl",
+                "one": "dl",
+                "two_four": "dl",
+                "five": "dl"
+            },
+            "unit_ratio": 0.1,
+            "step": 0.1
+        },
+        {
+            "id": 2,
+            "name": "Voda",
+            "unit": {
+                "fraction": "l",
+                "one": "l",
+                "two_four": "l",
+                "five": "l"
+            },
+            "unit_ratio": 1,
+            "step": 0.5
+        },
+        {
+            "id": 3,
+            "name": "Káva",
+            "unit": {
+                "fraction": "šálku",
+                "one": "šálek",
+                "two_four": "šálky",
+                "five": "šálků"
+            },
+            "unit_ratio": 0.25,
+            "step": 1
+        },
+        {
+            "id": 4,
+            "name": "Čaj",
+            "unit": {
+                "fraction": "šálku",
+                "one": "šálek",
+                "two_four": "šálky",
+                "five": "šálků"
+            },
+            "unit_ratio": 0.25,
+            "step": 1
+        },
+        {
+            "id": 5,
+            "name": "Slazený nápoj",
+            "unit": {
+                "fraction": "dl",
+                "one": "dl",
+                "two_four": "dl",
+                "five": "dl"
+            },
+            "unit_ratio": 0.1,
+            "step": 0.3
+        },
+        {
+            "id": 6,
+            "name": "Pivo",
+            "unit": {
+                "fraction": "l",
+                "one": "l",
+                "two_four": "l",
+                "five": "l"
+            },
+            "unit_ratio": 1,
+            "step": 0.5
+        },
+        {
+            "id": 7,
+            "name": "Víno",
+            "unit": {
+                "fraction": "dl",
+                "one": "dl",
+                "two_four": "dl",
+                "five": "dl"
+            },
+            "unit_ratio": 0.2,
+            "step": 0.2
+        },
+        {
+            "id": 8,
+            "name": "Tvrdý alkohol",
+            "unit": {
+                "fraction": "panáku",
+                "one": "panák",
+                "two_four": "panáky",
+                "five": "panáků"
+            },
+            "unit_ratio": 0.04,
+            "step": 1
+        }
+    ],
+    "activity": [
+        {
+            "id": 1,
+            "name": "Chůze",
+            "icon_url": "http://s3.svet-zdravi.cz/h5v/b6ole_ic-directions-walk-black-24dp.png"
+        },
+        {
+            "id": 2,
+            "name": "Běh",
+            "icon_url": "http://s3.svet-zdravi.cz/x8m/pvbtr_ic-directions-run-black-24dp.png"
+        },
+        {
+            "id": 3,
+            "name": "Cyklistika",
+            "icon_url": "http://s3.svet-zdravi.cz/091/6ed7t_ic-directions-bike-black-24dp.png"
+        },
+        {
+            "id": 4,
+            "name": "Fitness",
+            "icon_url": "http://s3.svet-zdravi.cz/7f9/3f1zb_ic-fitness-center-black-24dp.png"
+        },
+        {
+            "id": 5,
+            "name": "Plavání",
+            "icon_url": "http://s3.svet-zdravi.cz/h4e/q8ik6_ic-pool-black-24dp.png"
+        },
+        {
+            "id": 6,
+            "name": "Golf",
+            "icon_url": "http://s3.svet-zdravi.cz/w4q/imgyh_ic-golf-course-black-24dp.png"
+        }
+    ]
+}        

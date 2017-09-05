@@ -233,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
         Timber.d(""+manager.checkDirExists(manager.getFile("aaa")));
         Timber.d(""+manager.checkDirExists("bbb", null));
         Timber.d(""+manager.checkDirExists(manager.getFile("bbb")));
+
+        Timber.e("json test: " + manager.getStringFromAssetFile("kinds"));
     }
 
     @Override

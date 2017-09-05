@@ -1502,6 +1502,39 @@ public class FilesManager {
         return false;
     }
 
+    /**
+     * Get content of asset file as string on the given name (with path). It can work with text files like txt, json, ...
+     *
+     * @param fileName
+     *
+     * @return string of asset file content or null in case of error
+     */
+    public String getStringFromAssetFile(String fileName)
+    {
+        if (mContext == null || fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+
+        String stringContent;
+
+        try {
+            InputStream is = mContext.getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+
+            is.read(buffer);
+            is.close();
+
+            stringContent = new String(buffer, "UTF-8");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        return stringContent;
+    }
+
     //
     // COMMON METHODS
     //
