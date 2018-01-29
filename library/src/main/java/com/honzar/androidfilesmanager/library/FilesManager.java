@@ -424,7 +424,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destDir, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -446,7 +446,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destAbsolutePath, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -522,7 +522,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(srcFile, new File(destDir, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -549,7 +549,7 @@ public class FilesManager {
             src.close();
             dst.close();
             return true;
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             Timber.e(ex);
         }
         return false;
@@ -650,7 +650,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        return (new File(path, fileName)).delete();
+        try {
+            return (new File(path, fileName)).delete();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
     }
 
     /**
@@ -675,8 +680,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        if (new File(path, oldName).renameTo(new File(path, newName))) {
-            return new File(path, newName);
+        try {
+            if (new File(path, oldName).renameTo(new File(path, newName))) {
+                return new File(path, newName);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;
@@ -727,6 +736,9 @@ public class FilesManager {
      */
     public File createEmptyDir(String path, String dirName, int storageId)
     {
+        if (dirName == null)
+            return null;
+
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
@@ -759,7 +771,7 @@ public class FilesManager {
 
         try {
             FileUtils.deleteDirectory(new File(path));
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
             return false;
         }
@@ -779,8 +791,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        if (new File(path, oldName).renameTo(new File(path, newName))) {
-            return new File(path, newName);
+        try {
+            if (new File(path, oldName).renameTo(new File(path, newName))) {
+                return new File(path, newName);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;
@@ -831,7 +847,7 @@ public class FilesManager {
 
         try {
             FileUtils.deleteDirectory(new File(storage));
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
             return false;
         }
