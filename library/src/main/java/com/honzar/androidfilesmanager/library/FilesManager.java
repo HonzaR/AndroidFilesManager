@@ -467,7 +467,7 @@ public class FilesManager {
 
         String path = null;
         try {
-            path = getRealPathFromURI(uri);
+            path = getFilePathFromURI(uri);
         } catch (URISyntaxException urie) {
             Timber.e(urie);
         }
@@ -1278,11 +1278,11 @@ public class FilesManager {
 
 
     /**
-     * Returns real string path from URI
+     * Returns file string path from URI
      * @param contentUri
      * @return String file path.
      */
-    private static String getRealPathFromURI(Uri contentUri) throws URISyntaxException
+    public static String getFilePathFromURI(Uri contentUri) throws URISyntaxException
     {
         String selection = null;
         String[] selectionArgs = null;
