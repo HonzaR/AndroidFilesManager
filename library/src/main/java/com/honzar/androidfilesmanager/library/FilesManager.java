@@ -424,7 +424,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destDir, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -446,7 +446,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(new File(srcDir, fileName), new File(destAbsolutePath, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -522,7 +522,7 @@ public class FilesManager {
         try {
             FileUtils.copyFile(srcFile, new File(destDir, fileName), true);
             return true;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
         }
 
@@ -549,7 +549,7 @@ public class FilesManager {
             src.close();
             dst.close();
             return true;
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             Timber.e(ex);
         }
         return false;
@@ -650,7 +650,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        return (new File(path, fileName)).delete();
+        try {
+            return (new File(path, fileName)).delete();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return false;
     }
 
     /**
@@ -675,8 +680,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        if (new File(path, oldName).renameTo(new File(path, newName))) {
-            return new File(path, newName);
+        try {
+            if (new File(path, oldName).renameTo(new File(path, newName))) {
+                return new File(path, newName);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;
@@ -685,6 +694,27 @@ public class FilesManager {
     //
     //  DIRECTORY METHODS
     //
+
+    /**
+     * Checks if directory exists.
+     * @param dir
+     * @return true if directory exists, false otherwise.
+     */
+    public boolean checkDirExists(File dir)
+    {
+        return checkFileExists(dir);
+    }
+
+    /**
+     * Checks if directory exists on selected path.
+     * @param dirName
+     * @param path
+     * @return true if directory exists, false otherwise.
+     */
+    public boolean checkDirExists(String dirName, String path)
+    {
+        return checkFileExists(dirName, path);
+    }
 
     /**
      * Creates new empty directory with name and on selected path.
@@ -706,6 +736,9 @@ public class FilesManager {
      */
     public File createEmptyDir(String path, String dirName, int storageId)
     {
+        if (dirName == null)
+            return null;
+
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
@@ -738,7 +771,7 @@ public class FilesManager {
 
         try {
             FileUtils.deleteDirectory(new File(path));
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
             return false;
         }
@@ -758,8 +791,12 @@ public class FilesManager {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
-        if (new File(path, oldName).renameTo(new File(path, newName))) {
-            return new File(path, newName);
+        try {
+            if (new File(path, oldName).renameTo(new File(path, newName))) {
+                return new File(path, newName);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;
@@ -810,7 +847,7 @@ public class FilesManager {
 
         try {
             FileUtils.deleteDirectory(new File(storage));
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Timber.e(e);
             return false;
         }
@@ -1479,6 +1516,39 @@ public class FilesManager {
             Timber.e(e);
         }
         return false;
+    }
+
+    /**
+     * Get content of asset file as string on the given name (with path). It can work with text files like txt, json, ...
+     *
+     * @param fileName
+     *
+     * @return string of asset file content or null in case of error
+     */
+    public String getStringFromAssetFile(String fileName)
+    {
+        if (mContext == null || fileName == null || fileName.isEmpty()) {
+            return null;
+        }
+
+        String stringContent;
+
+        try {
+            InputStream is = mContext.getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+
+            is.read(buffer);
+            is.close();
+
+            stringContent = new String(buffer, "UTF-8");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
+        return stringContent;
     }
 
     //

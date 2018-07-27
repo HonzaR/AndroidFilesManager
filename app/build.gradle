@@ -26,6 +26,7 @@ dependencies {
     })
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
+    implementation 'com.jakewharton.timber:timber:4.7.0'
     testImplementation 'junit:junit:4.12'
     implementation project(path: ':library')
 }

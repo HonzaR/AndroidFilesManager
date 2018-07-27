@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import timber.log.Timber;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -227,6 +229,12 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Timber.d(""+manager.checkDirExists("aaa", null));
+        Timber.d(""+manager.checkDirExists(manager.getFile("aaa")));
+        Timber.d(""+manager.checkDirExists("bbb", null));
+        Timber.d(""+manager.checkDirExists(manager.getFile("bbb")));
+
+        Timber.e("json test: " + manager.getStringFromAssetFile("kinds"));
     }
 
     @Override
@@ -265,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
     {
         // nothing to do
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
