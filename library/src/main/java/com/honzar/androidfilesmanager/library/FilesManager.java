@@ -465,14 +465,9 @@ public class FilesManager {
         ExifInterface exifData = null;
         String exifOrientation = null;
 
-        String path = null;
-        try {
-            path = getFilePathFromURI(uri);
-        } catch (URISyntaxException urie) {
-            Timber.e(urie);
-        }
+        String path = getFilePathFromURI(uri);
 
-        if (path == null) {
+        if (path == null || path.isEmpty()) {
             return false;
         }
 
@@ -1319,7 +1314,7 @@ public class FilesManager {
      * @param contentUri
      * @return String file path.
      */
-    public static String getFilePathFromURI(Uri contentUri) throws URISyntaxException
+    public static String getFilePathFromURI(Uri contentUri)
     {
         String selection = null;
         String[] selectionArgs = null;
