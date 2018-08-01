@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,7 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -1104,6 +1104,24 @@ public class FilesManager {
             Timber.e(e);
         }
         return false;
+    }
+
+    public boolean writeBitmapToFile(File file, Bitmap bitmap)
+    {
+        if (file == null || !checkFileExists(file) || bitmap == null)
+            return false;
+
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            Timber.e(e);
+            return false;
+        }
+
+        return true;
     }
 
     //

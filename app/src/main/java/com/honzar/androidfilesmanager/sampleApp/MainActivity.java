@@ -3,8 +3,12 @@ package com.honzar.androidfilesmanager.sampleApp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -235,6 +239,20 @@ public class MainActivity extends AppCompatActivity {
         Timber.d(""+manager.checkDirExists(manager.getFile("bbb")));
 
         Timber.e("json test: " + manager.getStringFromAssetFile("kinds"));
+
+
+        final CoordinatorLayout cl = findViewById(R.id.cl_main);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                File file = manager.createEmptyFile(null, "test_bitmap.jpeg");
+                Bitmap bitmap = Bitmap.createBitmap(cl.getWidth(), cl.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(bitmap);
+                cl.layout(cl.getLeft(), cl.getTop(), cl.getRight(), cl.getBottom());
+                cl.draw(c);
+                manager.writeBitmapToFile(file, bitmap);
+            }
+        }, 1000);
     }
 
     @Override
