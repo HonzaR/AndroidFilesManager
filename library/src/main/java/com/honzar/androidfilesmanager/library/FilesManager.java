@@ -16,6 +16,7 @@ import android.os.StatFs;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Xml;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -40,6 +41,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,11 +83,11 @@ public class FilesManager {
 
     /**
      * Singleton method.
+     *
      * @param c context
      * @return FilesManager instance
      */
-    public static FilesManager getInstance(Context c, boolean allowLogging)
-    {
+    public static FilesManager getInstance(Context c, boolean allowLogging) {
         if (instance == null) {
             instance = new FilesManager(c);
         }
@@ -100,10 +102,10 @@ public class FilesManager {
 
     /**
      * Constructor.
+     *
      * @param c context
      */
-    private FilesManager(Context c)
-    {
+    private FilesManager(Context c) {
         this.mContext = c;
         this.prefsManager = SharedPreferencesManager.getInstance(mContext);
 
@@ -132,19 +134,19 @@ public class FilesManager {
 
     /**
      * Resolves current internal storage string.
+     *
      * @return storage string
      */
-    private String resolveInternalStorageString()
-    {
+    private String resolveInternalStorageString() {
         return mContext.getFilesDir().getAbsoluteFile() + "/";
     }
 
     /**
      * Resolves current external storage string.
+     *
      * @return storage string
      */
-    private String resolveExternalStorageString()
-    {
+    private String resolveExternalStorageString() {
         String storage = null;
         File[] extStorages = ContextCompat.getExternalFilesDirs(mContext, null);
         if (extStorages != null && extStorages.length > 0 && extStorages[0] != null) {
@@ -155,11 +157,11 @@ public class FilesManager {
 
     /**
      * Resolves storage path from storage ID.
+     *
      * @param storageId storage ID
      * @return storage string object
      */
-    private String getStoragePath(int storageId)
-    {
+    private String getStoragePath(int storageId) {
         switch (storageId) {
             case INTERNAL_STORAGE:
                 return internalStoragePath;
@@ -172,19 +174,19 @@ public class FilesManager {
 
     /**
      * Returns current storages configuration string.
+     *
      * @return current storages configuration string
      */
-    private String getStoragesConfiguration()
-    {
+    private String getStoragesConfiguration() {
         return internalStoragePath + externalStoragePath;
     }
 
     /**
      * Resolves and returns most current storages configuration.
+     *
      * @return storages string
      */
-    private String getMostCurrentStoragesConfigurations()
-    {
+    private String getMostCurrentStoragesConfigurations() {
         String internal = resolveInternalStorageString();
         String external = resolveExternalStorageString();
         return internal + external;
@@ -192,11 +194,11 @@ public class FilesManager {
 
     /**
      * Adds slash to end of path string, if they are missing.
+     *
      * @param path to be tested.
      * @return path string ending with "/" character
      */
-    private String addSlashToPathIfNeeded(String path)
-    {
+    private String addSlashToPathIfNeeded(String path) {
         if (path != null) {
 
             if (!path.endsWith("/"))
@@ -209,22 +211,22 @@ public class FilesManager {
 
     /**
      * Adds storage path at the beginning of dir
+     *
      * @param storagePath
      * @param dir
      * @return path string starting with storage path
      */
-    private String addDirectoryToStoragePath(String storagePath, String dir)
-    {
+    private String addDirectoryToStoragePath(String storagePath, String dir) {
         return (dir == null) ? storagePath : storagePath + dir;
     }
 
     /**
      * Returns storage free space in Bytes.
+     *
      * @param storagePath
      * @return storage free space in Bytes if succeed, -1 otherwise
      */
-    private long getStorageFreeSpace(String storagePath)
-    {
+    private long getStorageFreeSpace(String storagePath) {
         long availableSpace = -1L;
 
         if (storagePath != null) {
@@ -256,8 +258,7 @@ public class FilesManager {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
-    private boolean ensureFoldersOnGivenPath(File path)
-    {
+    private boolean ensureFoldersOnGivenPath(File path) {
         File parent = path.getParentFile();
         return (parent != null && !parent.exists() && !parent.mkdirs());
     }
@@ -269,45 +270,45 @@ public class FilesManager {
 
     /**
      * Returns File object.
+     *
      * @param fileName name of file
      * @return File object
      */
-    public File getFile(String fileName)
-    {
+    public File getFile(String fileName) {
         return getFile(null, fileName, DEFAULT_STORAGE);
     }
 
     /**
      * Returns File object.
+     *
      * @param filePath local path to file
      * @param fileName name of file
      * @return File object
      */
-    public File getFile(String filePath, String fileName)
-    {
+    public File getFile(String filePath, String fileName) {
         return getFile(filePath, fileName, DEFAULT_STORAGE);
     }
 
     /**
      * Returns File object.
-     * @param fileName name of file
+     *
+     * @param fileName  name of file
      * @param storageId preferred storage
      * @return File object
      */
-    public File getFile(String fileName, int storageId)
-    {
+    public File getFile(String fileName, int storageId) {
         return getFile(null, fileName, storageId);
     }
 
     /**
      * Returns File object.
-     * @param filePath local path to file
-     * @param fileName name of file
+     *
+     * @param filePath  local path to file
+     * @param fileName  name of file
      * @param storageId preferred storage
      * @return File object
      */
-    public File getFile(String filePath, String fileName, int storageId)
-    {
+    public File getFile(String filePath, String fileName, int storageId) {
         filePath = addSlashToPathIfNeeded(filePath);
 
         String storageToBeUsed = getStoragePath(storageId);
@@ -328,22 +329,22 @@ public class FilesManager {
 
     /**
      * Returns all files from directory.
+     *
      * @param path local directory path
      * @return all files from directory.
      */
-    public LinkedList<File> getAllFilesFromDir(String path)
-    {
+    public LinkedList<File> getAllFilesFromDir(String path) {
         return getAllFilesFromDir(path, DEFAULT_STORAGE);
     }
 
     /**
      * Returns all files from directory.
-     * @param path local directory path
+     *
+     * @param path      local directory path
      * @param storageId preferred storage
      * @return all files from directory.
      */
-    public LinkedList<File> getAllFilesFromDir(String path, int storageId)
-    {
+    public LinkedList<File> getAllFilesFromDir(String path, int storageId) {
         LinkedList<File> inFiles = new LinkedList<>();
 
         String storageToBeUsed = getStoragePath(storageId);
@@ -361,28 +362,28 @@ public class FilesManager {
 
     /**
      * Returns all files from external storage.
+     *
      * @return all files from external storage.
      */
-    public LinkedList<File> getAllFileFromExternalStorage()
-    {
+    public LinkedList<File> getAllFileFromExternalStorage() {
         return getAllFilesFromDir(null, EXTERNAL_STORAGE);
     }
 
     /**
      * Returns all files from internal storage.
+     *
      * @return all files from internal storage.
      */
-    public LinkedList<File> getAllFilesFromInternalStorage()
-    {
+    public LinkedList<File> getAllFilesFromInternalStorage() {
         return getAllFilesFromDir(null, INTERNAL_STORAGE);
     }
 
     /**
      * Returns all files from currently chosen storage.
+     *
      * @return all files from currently chosen storage.
      */
-    public LinkedList<File> getAllFileFromCurrentStorage()
-    {
+    public LinkedList<File> getAllFileFromCurrentStorage() {
         return getAllFilesFromDir(null, DEFAULT_STORAGE);
     }
 
@@ -393,26 +394,26 @@ public class FilesManager {
 
     /**
      * Copies file from one directory to another.
+     *
      * @param fileName
      * @param srcDir
      * @param destDir
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(String fileName, String srcDir, String destDir)
-    {
+    public boolean copyFile(String fileName, String srcDir, String destDir) {
         return copyFile(fileName, srcDir, destDir, DEFAULT_STORAGE);
     }
 
     /**
      * Copies file from one directory to another.
+     *
      * @param fileName
      * @param srcDir
      * @param destDir
      * @param storageId
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(String fileName, String srcDir, String destDir, int storageId)
-    {
+    public boolean copyFile(String fileName, String srcDir, String destDir, int storageId) {
         srcDir = (srcDir != null) ? addSlashToPathIfNeeded(srcDir) : "";
         destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
 
@@ -433,13 +434,13 @@ public class FilesManager {
 
     /**
      * Copies file from one directory to absolute path.
+     *
      * @param fileName
      * @param srcDir
      * @param destAbsolutePath
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFileToAbsolutePath(String fileName, String srcDir, String destAbsolutePath)
-    {
+    public boolean copyFileToAbsolutePath(String fileName, String srcDir, String destAbsolutePath) {
         srcDir = (srcDir != null) ? addSlashToPathIfNeeded(srcDir) : "";
         srcDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), srcDir);
 
@@ -455,61 +456,70 @@ public class FilesManager {
 
     /**
      * Copies file from one source to file on selected path persisting photo exif data.
+     *
      * @param uri
      * @param fileName
      * @param destDir
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFilePersistingExifData(Uri uri, String fileName, String destDir)
-    {
+    public boolean copyFilePersistingExifData(Uri uri, String fileName, String destDir) {
         ExifInterface exifData = null;
         String exifOrientation = null;
+        String contentFileName = "content_file_" + new Date().getTime() + ".jpeg";
 
-        String path = getFilePathFromURI(uri);
+        deleteFile(null, contentFileName);
 
-        if (path == null || path.isEmpty()) {
-            return false;
-        }
+        File srcFile = createEmptyFile(null, contentFileName);
 
-        File srcFile = new File(path);
+        if (writeDataFromUriToFile(srcFile, uri)) {
+            Timber.d("Absolute path: %s, exist: %b", srcFile.getAbsolutePath(), srcFile.exists());
 
-        try {   // persist exif photo data
-            exifData = new ExifInterface(srcFile.getAbsolutePath());
-            exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
-        } catch (IOException ioe) {   // may be caused by .png files, which don't work with exif
-            Timber.e(ioe);
-        }
-
-        if (copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE)) {
-
-            if (exifOrientation != null) {
-                try {
-                    ExifInterface newExif = new ExifInterface(getFile(destDir, fileName).getAbsolutePath());
-                    newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
-                    newExif.saveAttributes();
-                    return true;
-                } catch (IOException ioe) {
-                    Timber.e(ioe);
-                    return true;
-                } catch (UnsupportedOperationException unsupoe) {
-                    Timber.e(unsupoe);
-                    return true;
-                }
+            try {   // persist exif photo data
+                exifData = new ExifInterface(srcFile.getAbsolutePath());
+                exifOrientation = exifData.getAttribute(ExifInterface.TAG_ORIENTATION);
+            } catch (IOException ioe) {   // may be caused by .png files, which don't work with exif
+                Timber.e(ioe);
             }
+
+            if (copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE)) {
+                boolean finalResult = false;
+
+                if (exifOrientation != null) {
+                    try {
+                        ExifInterface newExif = new ExifInterface(getFile(destDir, fileName).getAbsolutePath());
+                        newExif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation);
+                        newExif.saveAttributes();
+                        finalResult = true;
+                    } catch (IOException ioe) {
+                        Timber.e(ioe);
+                        finalResult = true;
+                    } catch (UnsupportedOperationException unsupoe) {
+                        Timber.e(unsupoe);
+                        finalResult = true;
+                    }
+                }
+
+                deleteFile(null, contentFileName);
+
+                return finalResult;
+            }
+        } else {
+            deleteFile(null, contentFileName);
         }
+
         return false;
     }
 
     /**
      * Copies file from one source URI to file on selected path.
+     *
      * @param srcFile
      * @param fileName
      * @param destDir
      * @param storageId
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(File srcFile, String fileName, String destDir, int storageId)
-    {
+    public boolean copyFile(File srcFile, String fileName, String destDir, int storageId) {
         destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
         String storageToBeUsed = getStoragePath(storageId);
         destDir = addDirectoryToStoragePath(storageToBeUsed, destDir);
@@ -526,13 +536,13 @@ public class FilesManager {
 
     /**
      * Copies file from one source URI to file on selected path.
+     *
      * @param sourceUri
      * @param fileName
      * @param destDir
      * @return true if succeed, false otherwise.
      */
-    public boolean copyFile(Uri sourceUri, String fileName, String destDir)
-    {
+    public boolean copyFile(Uri sourceUri, String fileName, String destDir) {
         destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
         destDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), destDir);
 
@@ -544,9 +554,10 @@ public class FilesManager {
             src.close();
             dst.close();
             return true;
-        } catch (IOException | NullPointerException ex) {
+        } catch (IOException | NullPointerException | SecurityException ex) {
             Timber.e(ex);
         }
+
         return false;
     }
 
@@ -556,11 +567,11 @@ public class FilesManager {
 
     /**
      * Checks if file exists.
+     *
      * @param file
      * @return true if file exists, false otherwise.
      */
-    public boolean checkFileExists(File file)
-    {
+    public boolean checkFileExists(File file) {
         try {
             if (file.exists())
                 return true;
@@ -573,12 +584,12 @@ public class FilesManager {
 
     /**
      * Checks if file exists on selected path.
+     *
      * @param fileName
      * @param path
      * @return true if file exists, false otherwise.
      */
-    public boolean checkFileExists(String fileName, String path)
-    {
+    public boolean checkFileExists(String fileName, String path) {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
@@ -596,24 +607,24 @@ public class FilesManager {
 
     /**
      * Creates empty file with selected name on selected path.
+     *
      * @param filePath
      * @param fileName
      * @return empty File object on success, null otherwise.
      */
-    public File createEmptyFile(String filePath, String fileName)
-    {
+    public File createEmptyFile(String filePath, String fileName) {
         return createEmptyFile(filePath, fileName, DEFAULT_STORAGE);
     }
 
     /**
      * Creates empty file with selected name on selected path.
+     *
      * @param filePath
      * @param fileName
      * @param storageId
      * @return empty File object on success, null otherwise.
      */
-    public File createEmptyFile(String filePath, String fileName, int storageId)
-    {
+    public File createEmptyFile(String filePath, String fileName, int storageId) {
         filePath = (filePath != null) ? addSlashToPathIfNeeded(filePath) : "";
 
         String storageToBeUsed = getStoragePath(storageId);
@@ -636,12 +647,12 @@ public class FilesManager {
 
     /**
      * Deletes file with selected name on selected path.
+     *
      * @param path
      * @param fileName
      * @return true if succeed, false otherwise.
      */
-    public boolean deleteFile(String path, String fileName)
-    {
+    public boolean deleteFile(String path, String fileName) {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
@@ -655,23 +666,23 @@ public class FilesManager {
 
     /**
      * Deletes selected file.
+     *
      * @param file
      * @return true if succeed, false otherwise.
      */
-    public boolean deleteFile(File file)
-    {
+    public boolean deleteFile(File file) {
         return file.delete();
     }
 
     /**
      * Renames file on selected path with old name to new name.
+     *
      * @param path
      * @param oldName
      * @param newName
      * @return renamed File object if succeed, null otherwise.
      */
-    public File renameFile(String path, String oldName, String newName)
-    {
+    public File renameFile(String path, String oldName, String newName) {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
@@ -692,45 +703,45 @@ public class FilesManager {
 
     /**
      * Checks if directory exists.
+     *
      * @param dir
      * @return true if directory exists, false otherwise.
      */
-    public boolean checkDirExists(File dir)
-    {
+    public boolean checkDirExists(File dir) {
         return checkFileExists(dir);
     }
 
     /**
      * Checks if directory exists on selected path.
+     *
      * @param dirName
      * @param path
      * @return true if directory exists, false otherwise.
      */
-    public boolean checkDirExists(String dirName, String path)
-    {
+    public boolean checkDirExists(String dirName, String path) {
         return checkFileExists(dirName, path);
     }
 
     /**
      * Creates new empty directory with name and on selected path.
+     *
      * @param path
      * @param dirName
      * @return newly created File object, null otherwise.
      */
-    public File createEmptyDir(String path, String dirName)
-    {
+    public File createEmptyDir(String path, String dirName) {
         return createEmptyDir(path, dirName, DEFAULT_STORAGE);
     }
 
     /**
      * Creates new empty directory with name, on selected path and to preferred storage.
+     *
      * @param path
      * @param dirName
      * @param storageId
      * @return newly created File object, null otherwise.
      */
-    public File createEmptyDir(String path, String dirName, int storageId)
-    {
+    public File createEmptyDir(String path, String dirName, int storageId) {
         if (dirName == null)
             return null;
 
@@ -756,11 +767,11 @@ public class FilesManager {
 
     /**
      * Deletes whole directory with its content.
+     *
      * @param path
      * @return true if succeed, false otherwise.
      */
-    public boolean deleteDir(String path)
-    {
+    public boolean deleteDir(String path) {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
@@ -776,13 +787,13 @@ public class FilesManager {
 
     /**
      * Renames directory on selected path with old name to new name.
+     *
      * @param path
      * @param oldName
      * @param newName
      * @return renamed directory File object if succeed, null otherwise.
      */
-    public File renameDirectory(String path, String oldName, String newName)
-    {
+    public File renameDirectory(String path, String oldName, String newName) {
         path = (path != null) ? addSlashToPathIfNeeded(path) : "";
         path = addDirectoryToStoragePath(getStoragePath(currentStorageID), path);
 
@@ -803,19 +814,19 @@ public class FilesManager {
 
     /**
      * Returns current storage File object.
+     *
      * @return current storage File object.
      */
-    public String getCurrentStorage()
-    {
+    public String getCurrentStorage() {
         return getStoragePath(currentStorageID);
     }
 
     /**
      * Resolves optimal storage from currently available storages.
+     *
      * @return optimal storage ID
      */
-    public int getOptimalStorage()
-    {
+    public int getOptimalStorage() {
         if (isExternalStorageWritable()) {
 
             long extFreeSize = getExternalStorageFreeSpace();
@@ -833,11 +844,11 @@ public class FilesManager {
 
     /**
      * Deletes whole chosen storage.
+     *
      * @param storageId preferred storage to be deleted
      * @return true if succeed, false otherwise.
      */
-    public boolean deleteStorage(int storageId)
-    {
+    public boolean deleteStorage(int storageId) {
         String storage = getStoragePath(storageId);
 
         try {
@@ -852,10 +863,10 @@ public class FilesManager {
 
     /**
      * Moves files from current storage to external
+     *
      * @param callbacks to inform about result
      */
-    public void moveStorageToExternal(OptimalStorageMoveInterface callbacks)
-    {
+    public void moveStorageToExternal(OptimalStorageMoveInterface callbacks) {
         if (currentStorageID == EXTERNAL_STORAGE) {
             if (callbacks != null) {
                 callbacks.moveStorageAlreadyDone();
@@ -868,10 +879,10 @@ public class FilesManager {
 
     /**
      * Moves files from current storage to internal
+     *
      * @param callbacks to inform about result
      */
-    public void moveStorageToInternal(OptimalStorageMoveInterface callbacks)
-    {
+    public void moveStorageToInternal(OptimalStorageMoveInterface callbacks) {
         if (currentStorageID == INTERNAL_STORAGE) {
             if (callbacks != null) {
                 callbacks.moveStorageAlreadyDone();
@@ -884,10 +895,10 @@ public class FilesManager {
 
     /**
      * Moves current storage files to optimal storage, if different.
+     *
      * @param callbacks to inform about result
      */
-    public void moveStorageToOptimal(OptimalStorageMoveInterface callbacks)
-    {
+    public void moveStorageToOptimal(OptimalStorageMoveInterface callbacks) {
         if (currentStorageID == getOptimalStorage()) {
             if (callbacks != null) {
                 callbacks.moveStorageAlreadyDone();
@@ -900,10 +911,10 @@ public class FilesManager {
 
     /**
      * Check if there is some changes in storages configuration
+     *
      * @return true/false
      */
-    public boolean checkIfStoragesChanged()
-    {
+    public boolean checkIfStoragesChanged() {
         if (prefsManager.getPrefsLastStoragesConfiguration() == null) { // first launch
             currentStorageID = getOptimalStorage();
             prefsManager.saveSelectedStorage(currentStorageID);
@@ -916,10 +927,10 @@ public class FilesManager {
 
     /**
      * Checks if optimal storage is used.
+     *
      * @return true/false
      */
-    public boolean isOptimalStorageUsed()
-    {
+    public boolean isOptimalStorageUsed() {
         return (getOptimalStorage() == prefsManager.getSelectedStorage());
     }
 
@@ -929,10 +940,10 @@ public class FilesManager {
 
     /**
      * Returns if external storage is writable.
+     *
      * @return true/false
      */
-    public boolean isExternalStorageWritable()
-    {
+    public boolean isExternalStorageWritable() {
         if (externalStoragePath != null) {
             String state = Environment.getExternalStorageState();
             if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -944,10 +955,10 @@ public class FilesManager {
 
     /**
      * Returns if external storage is readable.
+     *
      * @return true/false
      */
-    public boolean isExternalStorageReadable()
-    {
+    public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state) ||
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
@@ -958,28 +969,28 @@ public class FilesManager {
 
     /**
      * Returns current storage free space in Bytes.
+     *
      * @return current storage free space in Bytes if succeed, -1 otherwise
      */
-    public long getCurrentStorageFreeSpace()
-    {
+    public long getCurrentStorageFreeSpace() {
         return getStorageFreeSpace(getStoragePath(currentStorageID));
     }
 
     /**
      * Returns external storage free space in Bytes.
+     *
      * @return external storage free space in Bytes if succeed, -1 otherwise
      */
-    public long getExternalStorageFreeSpace()
-    {
+    public long getExternalStorageFreeSpace() {
         return getStorageFreeSpace(externalStoragePath);
     }
 
     /**
      * Returns internal storage free space in Bytes.
+     *
      * @return internal storage free space in Bytes if succeed, -1 otherwise
      */
-    public long getInternalStorageFreeSpace()
-    {
+    public long getInternalStorageFreeSpace() {
         return getStorageFreeSpace(internalStoragePath);
     }
 
@@ -990,12 +1001,12 @@ public class FilesManager {
 
     /**
      * Writes string data to file.
+     *
      * @param file
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeStringToFile(File file, String data)
-    {
+    public boolean writeStringToFile(File file, String data) {
         try {
             FileOutputStream out = new FileOutputStream(file);
             out.write(data.getBytes());
@@ -1009,12 +1020,12 @@ public class FilesManager {
 
     /**
      * Writes Uri data to file.
+     *
      * @param file
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeDataFromUriToFile(File file, Uri data)
-    {
+    public boolean writeDataFromUriToFile(File file, Uri data) {
         InputStream initialStream = null;
         try {
             initialStream = mContext.getContentResolver().openInputStream(data);
@@ -1033,12 +1044,12 @@ public class FilesManager {
 
     /**
      * Writes Json data to file.
+     *
      * @param file
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeJsonToFile(File file, JSONObject data)
-    {
+    public boolean writeJsonToFile(File file, JSONObject data) {
         try {
             FileOutputStream out = new FileOutputStream(file);
             out.write((data.toString()).getBytes());
@@ -1052,12 +1063,12 @@ public class FilesManager {
 
     /**
      * Writes Xml data to file.
+     *
      * @param file
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeXmlToFile(File file, Document data)
-    {
+    public boolean writeXmlToFile(File file, Document data) {
         try {
             FileOutputStream out = new FileOutputStream(file);
             StringWriter writer = new StringWriter();
@@ -1089,12 +1100,12 @@ public class FilesManager {
 
     /**
      * Writes byte[] data to file.
+     *
      * @param file
      * @param data
      * @return true if succeed, false otherwise.
      */
-    public boolean writeByteArrayToFile(File file, byte[] data)
-    {
+    public boolean writeByteArrayToFile(File file, byte[] data) {
         try {
             FileOutputStream out = new FileOutputStream(file);
             out.write(data);
@@ -1106,8 +1117,7 @@ public class FilesManager {
         return false;
     }
 
-    public boolean writeBitmapToFile(File file, Bitmap bitmap)
-    {
+    public boolean writeBitmapToFile(File file, Bitmap bitmap) {
         if (file == null || !checkFileExists(file) || bitmap == null)
             return false;
 
@@ -1134,12 +1144,10 @@ public class FilesManager {
      * @param folder
      * @param zipFilePath
      * @param zipFileName name of file ending with ".zip"
-     * @param password optional password
-     *
+     * @param password    optional password
      * @return true if succeed, false otherwise.
      */
-    public boolean compressFilesToZip(File folder, String zipFilePath, String zipFileName, String password)
-    {
+    public boolean compressFilesToZip(File folder, String zipFilePath, String zipFileName, String password) {
         if (folder == null || !folder.isDirectory()) {
             return false;
         }
@@ -1152,12 +1160,10 @@ public class FilesManager {
      * @param files
      * @param zipFilePath
      * @param zipFileName name of file ending with ".zip"
-     * @param password optional password
-     *
+     * @param password    optional password
      * @return true if succeed, false otherwise.
      */
-    public boolean compressFilesToZip(List<File> files, String zipFilePath, String zipFileName, String password)
-    {
+    public boolean compressFilesToZip(List<File> files, String zipFilePath, String zipFileName, String password) {
         if (zipFileName == null || zipFileName.isEmpty()) {
             return false;
         }
@@ -1208,11 +1214,9 @@ public class FilesManager {
      * @param outputPath
      * @param zipFile
      * @param password
-     *
      * @return true if succeed, false otherwise.
      */
-    public boolean extractFilesFromZip(String outputPath, File zipFile, String password)
-    {
+    public boolean extractFilesFromZip(String outputPath, File zipFile, String password) {
         if (zipFile == null || !zipFile.exists()) {
             return false;
         }
@@ -1244,11 +1248,11 @@ public class FilesManager {
 
     /**
      * Reads String content of file.
+     *
      * @param file
      * @return String Object if succeed, null otherwise.
      */
-    public String readStringFromFile(File file)
-    {
+    public String readStringFromFile(File file) {
         if (file != null) {
 
             try {
@@ -1262,11 +1266,11 @@ public class FilesManager {
 
     /**
      * Reads JSONObject content of file.
+     *
      * @param file
      * @return JSONObject if succeed, null otherwise.
      */
-    public JSONObject readJsonFromFile(File file)
-    {
+    public JSONObject readJsonFromFile(File file) {
         String res = readStringFromFile(file);
 
         try {
@@ -1280,11 +1284,11 @@ public class FilesManager {
 
     /**
      * Reads Xml content of file.
+     *
      * @param file
      * @return Xml if succeed, null otherwise.
      */
-    public Document readXmlFromFile(File file)
-    {
+    public Document readXmlFromFile(File file) {
         String content = readStringFromFile(file);
 
         if (content != null) {
@@ -1310,11 +1314,11 @@ public class FilesManager {
 
     /**
      * Reads byte array content of file.
+     *
      * @param file
      * @return byte[] if succeed, null otherwise.
      */
-    public byte[] readByteArrayFromFile(File file)
-    {
+    public byte[] readByteArrayFromFile(File file) {
         if (file != null) {
 
             try {
@@ -1329,26 +1333,65 @@ public class FilesManager {
 
     /**
      * Returns file string path from URI
+     *
      * @param contentUri
      * @return String file path.
      */
-    public static String getFilePathFromURI(Uri contentUri)
-    {
+    public static String getFilePathFromURI(Uri contentUri) {
         String selection = null;
         String[] selectionArgs = null;
 
         // Uri is different in versions after KITKAT (Android 4.4), we need to
         if (Build.VERSION.SDK_INT >= 19 && DocumentsContract.isDocumentUri(mContext, contentUri)) {
-
             if (isExternalStorageDocument(contentUri)) {
                 final String docId = DocumentsContract.getDocumentId(contentUri);
                 final String[] split = docId.split(":");
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
 
+                if ("primary".equalsIgnoreCase(split[0])) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                } else {
+                    String filePath = "";
+
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                        File[] external = mContext.getExternalMediaDirs();
+
+                        if (external.length > 1) {
+                            filePath = external[1].getAbsolutePath();
+                            filePath = filePath.substring(0, filePath.indexOf("Android")) + split[1];
+                        }
+                    } else {
+                        filePath = "/storage/" + split[0] + "/" + split[1];
+                    }
+
+                    return filePath;
+                }
             } else if (isDownloadsDocument(contentUri)) {
                 final String id = DocumentsContract.getDocumentId(contentUri);
-                contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
 
+                if (!TextUtils.isEmpty(id)) {
+                    if (id.startsWith("raw:")) {
+                        return id.replaceFirst("raw:", "");
+                    } else {
+                        String[] contentUriPrefixesToTry = new String[]{
+                                "content://downloads/public_downloads",
+                                "content://downloads/my_downloads",
+                                "content://downloads/all_downloads"
+                        };
+
+                        for (String contentUriPrefix : contentUriPrefixesToTry) {
+                            contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
+                            String path = getDataColumn(contentUri, null, null);
+
+                            if (path != null) {
+                                return path;
+                            }
+                        }
+
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
             } else if (isMediaDocument(contentUri)) {
                 final String docId = DocumentsContract.getDocumentId(contentUri);
                 final String[] split = docId.split(":");
@@ -1370,25 +1413,32 @@ public class FilesManager {
         }
 
         if ("content".equalsIgnoreCase(contentUri.getScheme())) {
-            String[] projection = {
-                    MediaStore.Images.Media.DATA
-            };
-
-            Cursor cursor = null;
-            try {
-                cursor = mContext.getContentResolver().query(contentUri, projection, selection, selectionArgs, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                if (cursor.moveToFirst()) {
-                    String str = cursor.getString(column_index);
-                    cursor.close();
-                    return str;
-                }
-            } catch (NullPointerException e) {
-                Timber.e(e);
-            }
-
+            return getDataColumn(contentUri, selection, selectionArgs);
         } else if ("file".equalsIgnoreCase(contentUri.getScheme())) {
             return contentUri.getPath();
+        }
+
+        return null;
+    }
+
+    private static String getDataColumn(Uri contentUri, String selection, String[] selectionArgs) {
+        Cursor cursor = null;
+        String[] projection = {
+                MediaStore.Images.Media.DATA
+        };
+
+        try {
+            cursor = mContext.getContentResolver().query(contentUri, projection, selection, selectionArgs, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                return cursor.getString(column_index);
+            }
+        } catch (NullPointerException e) {
+            Timber.e(e);
+        } finally {
+            if (cursor != null)
+                cursor.close();
         }
 
         return null;
@@ -1402,11 +1452,9 @@ public class FilesManager {
      * Returns array of paths to files on the given path in asset folder
      *
      * @param path
-     *
      * @return array of paths to files in asset folder or empty list in case of error or empty folder in path
      */
-    public String[] getArrayOfAssetFilesPaths(String path)
-    {
+    public String[] getArrayOfAssetFilesPaths(String path) {
         String[] list = new String[]{};
 
         if (path == null) {
@@ -1436,11 +1484,9 @@ public class FilesManager {
      * Returns array of files names on the given path in asset folder
      *
      * @param path
-     *
      * @return array of paths to files in asset folder or empty list in case of error or empty folder in path
      */
-    public String[] getArrayOfAssetFilesNames(String path)
-    {
+    public String[] getArrayOfAssetFilesNames(String path) {
         String[] list = new String[]{};
 
         if (path == null) {
@@ -1465,11 +1511,9 @@ public class FilesManager {
      *
      * @param assetFilePath
      * @param outputDirectory
-     *
      * @return true in case of success, false otherwise
      */
-    public boolean copyFileFromAssets(String assetFilePath, String outputDirectory)
-    {
+    public boolean copyFileFromAssets(String assetFilePath, String outputDirectory) {
         if (mContext == null || assetFilePath == null || assetFilePath.isEmpty()) {
             return false;
         }
@@ -1509,11 +1553,9 @@ public class FilesManager {
      *
      * @param assetDirPath
      * @param outputDirectory
-     *
      * @return true in case of success, false otherwise
      */
-    public boolean copyDirectoryWithContentFromAssets(String assetDirPath, String outputDirectory)
-    {
+    public boolean copyDirectoryWithContentFromAssets(String assetDirPath, String outputDirectory) {
         if (mContext == null || assetDirPath == null || assetDirPath.isEmpty()) {
             return false;
         }
@@ -1535,11 +1577,9 @@ public class FilesManager {
      * Get content of asset file as string on the given name (with path). It can work with text files like txt, json, ...
      *
      * @param fileName
-     *
      * @return string of asset file content or null in case of error
      */
-    public String getStringFromAssetFile(String fileName)
-    {
+    public String getStringFromAssetFile(String fileName) {
         if (mContext == null || fileName == null || fileName.isEmpty()) {
             return null;
         }
@@ -1581,11 +1621,9 @@ public class FilesManager {
      * Adds image file to gallery
      *
      * @param photoWholeUrl
-     *
      * @return true in case of success, false otherwise
      */
-    public static boolean addPhotoToGallery(String photoWholeUrl)
-    {
+    public static boolean addPhotoToGallery(String photoWholeUrl) {
         if (mContext == null || photoWholeUrl == null || photoWholeUrl.isEmpty()) {
             return false;
         }
@@ -1624,6 +1662,7 @@ public class FilesManager {
 
         /**
          * Task constructor.
+         *
          * @param context
          * @param storageID
          * @param callbacks
@@ -1692,8 +1731,11 @@ public class FilesManager {
      */
     public interface OptimalStorageMoveInterface {
         void moveStorageStarts(MoveStorageTask task);
+
         void moveStorageEndsSuccess(MoveStorageTask task);
+
         void moveStorageEndsError(MoveStorageTask task, Exception e);
+
         void moveStorageAlreadyDone();
     }
 

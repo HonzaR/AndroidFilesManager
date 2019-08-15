@@ -233,12 +233,12 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Timber.d(""+manager.checkDirExists("aaa", null));
-        Timber.d(""+manager.checkDirExists(manager.getFile("aaa")));
-        Timber.d(""+manager.checkDirExists("bbb", null));
-        Timber.d(""+manager.checkDirExists(manager.getFile("bbb")));
+        Timber.d("%s", manager.checkDirExists("aaa", null));
+        Timber.d("%s", manager.checkDirExists(manager.getFile("aaa")));
+        Timber.d("%s", manager.checkDirExists("bbb", null));
+        Timber.d("%s", manager.checkDirExists(manager.getFile("bbb")));
 
-        Timber.e("json test: " + manager.getStringFromAssetFile("kinds"));
+        Timber.e("json test: %s", manager.getStringFromAssetFile("kinds"));
 
 
         final CoordinatorLayout cl = findViewById(R.id.cl_main);
@@ -261,7 +261,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (data != null) {
             final Uri resultUri = data.getData();
-            manager.copyFilePersistingExifData(resultUri, "image_pick_copy.jpeg", null);
+
+            Timber.d("Uri: %s, file copied: %b", resultUri,
+                    manager.copyFilePersistingExifData(resultUri, "image_pick_copy.jpeg", null));
         }
     }
 
