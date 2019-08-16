@@ -206,6 +206,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button btnTest12 = findViewById(R.id.btn_test_12);
+        btnTest12.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri fileUri = Uri.parse("file://" + manager.getFile(null, "image_pick_copy.jpeg"));
+
+                Timber.d("Test #12, uri: %s, file copied: %b", fileUri,
+                        manager.copyFile(fileUri, "image_pick_copy.jpeg", null));
+            }
+        });
+
         manager.writeByteArrayToFile(manager.getFile("test1"), new byte[] { (byte)0xe0});
         manager.writeStringToFile(manager.getFile("test2.txt"), "test");
         try {
@@ -262,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
         if (data != null) {
             final Uri resultUri = data.getData();
 
-            Timber.d("Uri: %s, file copied: %b", resultUri,
+            Timber.d("ActivityResult, uri: %s, file copied: %b", resultUri,
                     manager.copyFilePersistingExifData(resultUri, "image_pick_copy.jpeg", null));
         }
     }

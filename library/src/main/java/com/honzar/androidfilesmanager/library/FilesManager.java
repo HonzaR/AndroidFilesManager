@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Xml;
+import android.webkit.MimeTypeMap;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
@@ -33,7 +34,6 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -263,6 +263,9 @@ public class FilesManager {
         return (parent != null && !parent.exists() && !parent.mkdirs());
     }
 
+    private static boolean isContentResolverDocument(Uri uri) {
+        return uri != null && uri.getScheme() != null && "content".equals(uri.getScheme());
+    }
 
     //
     //  GET FILES METHODS
@@ -465,13 +468,44 @@ public class FilesManager {
     public boolean copyFilePersistingExifData(Uri uri, String fileName, String destDir) {
         ExifInterface exifData = null;
         String exifOrientation = null;
-        String contentFileName = "content_file_" + new Date().getTime() + ".jpeg";
+        File srcFile;
+        String contentFileName = "content_file_" + new Date().getTime() + ".";
+        String extension;
 
-        deleteFile(null, contentFileName);
+        if (uri != null) {
+            if (isContentResolverDocument(uri)) {
+                final MimeTypeMap mime = MimeTypeMap.getSingleton();
+                extension = mime.getExtensionFromMimeType(mContext.getContentResolver().getType(uri));
 
-        File srcFile = createEmptyFile(null, contentFileName);
+                if (extension != null && (extension.equals("jpeg") || extension.equals("jpg"))) {
+                    contentFileName += extension;
+                    deleteFile(null, contentFileName);
+                    srcFile = createEmptyFile(null, contentFileName);
 
-        if (writeDataFromUriToFile(srcFile, uri)) {
+                    if (!writeDataFromUriToFile(srcFile, uri)) {
+                        deleteFile(null, contentFileName);
+                        return false;
+                    }
+                } else {
+                    return copyFile(uri, fileName, destDir);
+                }
+            } else {
+                String filePath = uri.getPath();
+
+                if (filePath == null || filePath.isEmpty()) {
+                    return false;
+                }
+
+                srcFile = new File(filePath);
+
+                Uri fileUri = Uri.fromFile(srcFile);
+                extension = MimeTypeMap.getFileExtensionFromUrl(fileUri.toString());
+
+                if (extension != null && !(extension.equals("jpeg") || extension.equals("jpg"))) {
+                    return copyFile(srcFile, fileName, destDir, DEFAULT_STORAGE);
+                }
+            }
+
             Timber.d("Absolute path: %s, exist: %b", srcFile.getAbsolutePath(), srcFile.exists());
 
             try {   // persist exif photo data
@@ -499,12 +533,12 @@ public class FilesManager {
                     }
                 }
 
-                deleteFile(null, contentFileName);
+                if (extension != null && contentFileName.contains(extension)) {
+                    deleteFile(null, contentFileName);
+                }
 
                 return finalResult;
             }
-        } else {
-            deleteFile(null, contentFileName);
         }
 
         return false;
@@ -543,19 +577,25 @@ public class FilesManager {
      * @return true if succeed, false otherwise.
      */
     public boolean copyFile(Uri sourceUri, String fileName, String destDir) {
-        destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
-        destDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), destDir);
+        if (sourceUri != null) {
+            if (isContentResolverDocument(sourceUri)) {
+                return writeDataFromUriToFile(sourceUri, fileName, destDir);
+            }
 
-        try {
-            File source = new File(sourceUri.getPath());
-            FileChannel src = new FileInputStream(source).getChannel();
-            FileChannel dst = new FileOutputStream(new File(destDir, fileName)).getChannel();
-            dst.transferFrom(src, 0, src.size());
-            src.close();
-            dst.close();
-            return true;
-        } catch (IOException | NullPointerException | SecurityException ex) {
-            Timber.e(ex);
+            destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
+            destDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), destDir);
+
+            try {
+                File source = new File(sourceUri.getPath());
+                FileChannel src = new FileInputStream(source).getChannel();
+                FileChannel dst = new FileOutputStream(new File(destDir, fileName)).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                return true;
+            } catch (IOException | NullPointerException | SecurityException ex) {
+                Timber.e(ex);
+            }
         }
 
         return false;
@@ -1027,19 +1067,44 @@ public class FilesManager {
      */
     public boolean writeDataFromUriToFile(File file, Uri data) {
         InputStream initialStream = null;
+        boolean result = false;
+
         try {
             initialStream = mContext.getContentResolver().openInputStream(data);
             byte[] buffer = new byte[initialStream.available()];
             initialStream.read(buffer);
             OutputStream outStream = new FileOutputStream(file);
             outStream.write(buffer);
-            return true;
-        } catch (FileNotFoundException e) {
+            outStream.close();
+            result = true;
+        } catch (IOException |SecurityException e) {
             Timber.e(e);
-        } catch (IOException e) {
-            Timber.e(e);
+        } finally {
+            if (initialStream != null) {
+                try {
+                    initialStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return false;
+
+        return result;
+    }
+
+    /**
+     * Writes Uri data to file.
+     *
+     * @param data
+     * @param fileName
+     * @param destDir
+     * @return true if succeed, false otherwise.
+     */
+    public boolean writeDataFromUriToFile(Uri data, String fileName, String destDir) {
+        destDir = (destDir != null) ? addSlashToPathIfNeeded(destDir) : "";
+        destDir = addDirectoryToStoragePath(getStoragePath(currentStorageID), destDir);
+
+        return writeDataFromUriToFile(new File(destDir, fileName), data);
     }
 
     /**

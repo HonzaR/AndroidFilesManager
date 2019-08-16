@@ -92,4 +92,13 @@
         android:layout_height="wrap_content"
         android:text="test #11" />
 
+    <Button
+        android:id="@+id/btn_test_12"
+        android:layout_toEndOf="@+id/btn_test_3"
+        android:layout_toRightOf="@+id/btn_test_3"
+        android:layout_below="@+id/btn_test_11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test #12" />
+
 </RelativeLayout>
