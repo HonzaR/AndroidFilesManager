@@ -1084,7 +1084,7 @@ public class FilesManager {
                 try {
                     initialStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Timber.e(e);
                 }
             }
         }
@@ -1662,7 +1662,7 @@ public class FilesManager {
             stringContent = new String(buffer, "UTF-8");
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Timber.e(ex);
             return null;
         }
 
